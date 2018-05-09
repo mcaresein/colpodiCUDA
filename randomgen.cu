@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 #include "randomgen.h"
 
 __host__ __device__ Randomgen::Randomgen(int Sa, int Sb, int Sc, int Sd){
@@ -30,3 +31,17 @@ __host__ __device__ double Randomgen::Rand(){
     _Sd=this->LCGStep(_Sd, 1664525, 1013904223UL);
     return 2.3283064365387e-10*(_Sa^_Sb^_Sc^_Sd);
 };
+
+__host__ __device__ double Randomgen::Gauss(){
+    #ifdef __CUDA_ARCH__
+        double u=this->Rand();
+        double v=this->Rand();
+        return sqrt(-2.*log(u))*cos(2*M_PI*v);
+    #else
+        double u=2.*this->Rand()-1;
+        double v=2.*this->Rand()-1;
+        double r=u*u+v*v;
+        if(r==0 || r>=1) return this->Gauss();
+        return u*sqrt(-2.*log(r)/r);
+    #endif
+}
