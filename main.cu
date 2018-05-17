@@ -1,3 +1,6 @@
+/*###################
+# nick ricchiò ######
+####################*/
 #include <iostream>
 #include "Pricer.h"
 #include "Statistics.h"
