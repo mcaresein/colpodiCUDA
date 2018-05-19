@@ -16,7 +16,7 @@ __host__ __device__  MontecarloPath::MontecarloPath(float SInitial, float TIniti
 
 __host__ __device__  MontecarloPath::~MontecarloPath(){
     delete[] _UnderlyingPath;
-}
+};
 
 __host__ __device__  float* MontecarloPath::GetPath(){
 
@@ -28,7 +28,7 @@ __host__ __device__  float* MontecarloPath::GetPath(){
         temp = _Process->Step(temp, TStep, w);
         _UnderlyingPath[i]=temp;
     }
+    
     return _UnderlyingPath;
-//    return _UnderlyingPath[_NSteps-1];
-//    return temp;
+
 };

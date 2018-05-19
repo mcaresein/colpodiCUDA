@@ -1,16 +1,18 @@
-#include "DataTypes.h"
+/*#########################################################
+# Classe per la generazione di numeri casuali distribuiti #
+# uniformemente (Uniform) o gaussianamente (Gauss).       #
+#########################################################*/
 
 #ifndef _RandomGenerator_h_
 #define _RandomGenerator_h_
 
+#include "DataTypes.h"
+
 class RandomGenerator{
 public:
-//__host__ __device__ RandomGenerator();
   __host__ __device__  virtual float Uniform()=0;
   __host__ __device__  float Gauss();
-//__host__ __device__ ~RandomGenerator();
 };
-
 
 class CombinedGenerator: public RandomGenerator{
 public:

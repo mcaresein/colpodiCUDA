@@ -1,3 +1,8 @@
+/*###############################
+# Tipi di dati utilizzati nello #
+# algoritmo.                    #
+###############################*/
+
 #ifndef _Seed_h_
 #define _Seed_h_
 

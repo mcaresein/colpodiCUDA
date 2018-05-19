@@ -1,7 +1,13 @@
-#include <iostream>
-#include "DataTypes.h"
+/*###################################################
+# Classe che ha i metodi per il calcolo del PayOff  #
+# sommato e PayOff quadrato sommato (GetPrice).     #
+###################################################*/
+
 #ifndef _Pricer_h_
 #define _Pricer_h_
+
+#include <iostream>
+#include "DataTypes.h"
 
 class MonteCarloPricer{
 public:

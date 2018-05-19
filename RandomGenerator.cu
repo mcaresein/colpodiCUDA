@@ -12,16 +12,14 @@ __host__ __device__  CombinedGenerator::CombinedGenerator(Seed S){
 
 __host__ __device__  unsigned int CombinedGenerator::LCGStep(unsigned int seed, unsigned int a, unsigned long b){
 	unsigned int x=(a*seed+b)%UINT_MAX;
-//    float y=x;
-//	float r=y/UINT_MAX;
+
 	return x;
-}
+};
 
 __host__ __device__  unsigned int CombinedGenerator::TausStep(unsigned int seed, unsigned int K1, unsigned int K2, unsigned int K3, unsigned long M){
 	unsigned int b=(((seed<<K1)^seed)>>K2);
-    unsigned int x=(((seed&M)<<K3)^b);
-//    float y=x;
-//	float r=y/UINT_MAX;
+  unsigned int x=(((seed&M)<<K3)^b);
+
 	return x;
 };
 
@@ -38,11 +36,13 @@ __host__ __device__ float RandomGenerator::Gauss(){
         float u=this->Uniform();
         float v=this->Uniform();
         return sqrt(-2.*log(u))*cos(2*M_PI*v);
-//cpu
-//        float u=2.*this->Uniform()-1;
-//        float v=2.*this->Uniform()-1;
-//        float r=u*u+v*v;
-//        if(r==0 || r>=1) return this->Gauss();
-//        return u*sqrt(-2.*log(r)/r);
+
+//## Stesso risultato ma calcolo ottimizzato per CPU. ##########################
+
+/*      float u=2.*this->Uniform()-1;
+        float v=2.*this->Uniform()-1;
+        float r=u*u+v*v;
+        if(r==0 || r>=1) return this->Gauss();
+        return u*sqrt(-2.*log(r)/r); */
 
 };

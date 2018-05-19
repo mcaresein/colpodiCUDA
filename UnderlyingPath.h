@@ -1,11 +1,16 @@
+/*#######################################################
+# Classe che implementa il metodo per costruire il path #
+# del prezzo dell'opzione (GetPath).                    #
+#######################################################*/
+
 #ifndef _UnderlyingPath_h_
 #define _UnderlyingPath_h_
+
 #include "RandomGenerator.h"
 #include "StocasticProcess.h"
 
 class UnderlyingPath{
 public:
-//__host__ __device__ UnderlyingPath();
   __host__ __device__  virtual float* GetPath()=0;
 };
 

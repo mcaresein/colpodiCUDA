@@ -15,11 +15,12 @@ __device__ __host__ MonteCarloPricer::MonteCarloPricer(MarketData MarketInput, O
     _S=S;
 };
 
+//## Metodo per il calcolo del PayOff sommato e PayOff quadrato sommato. #######
+
 __device__ __host__ void MonteCarloPricer::GetPrice(){
+
     PayOffPlainVanilla pay;
-
     RandomGenerator* Generator=new CombinedGenerator(_S);
-
     StocasticProcess* Process=new EulerLogNormalProcess(_MarketInput.Volatility, _MarketInput.Drift);
 
     MontecarloPath Path(_MarketInput.SInitial, _OptionInput.TInitial, _OptionInput.TFinal, Generator, Process, _OptionInput.NSteps);
@@ -35,13 +36,14 @@ __device__ __host__ void MonteCarloPricer::GetPrice(){
     _PayOff=_PayOff;
     _PayOff2=_PayOff2;
 
-
 };
 
+//## Metodo che restituisce il PayOff sommato. #################################
 __device__ __host__ float MonteCarloPricer::GetPayOff(){
     return _PayOff;
 };
 
+//## Metodo che restituisce il PayOff quadrato sommato. ########################
 __device__ __host__ float MonteCarloPricer::GetPayOff2(){
     return _PayOff2;
 };

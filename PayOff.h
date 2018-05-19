@@ -1,3 +1,8 @@
+/*##########################################
+# Tipi di Payoff utilizzabili implementati #
+# nell' algoritmo.                         #
+##########################################*/
+
 #ifndef _PayOff_h_
 #define _PayOff_h_
 

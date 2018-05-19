@@ -1,3 +1,10 @@
+/*#############################################
+# Classe che implementa i metodi per ottenere #
+# prezzo dell'opzione mediato su tutti gli    #
+# scenari montecarlo (GetPrice) e l'errore    #
+#	montecarlo associato (GetMCError).          #
+#############################################*/
+
 #ifndef _Statistics_h_
 #define _Statistics_h_
 

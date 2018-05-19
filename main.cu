@@ -1,6 +1,13 @@
-/*###################
-# nick ricchiò ######
-####################*/
+/*##############################################################################################################################################################
+# Pricer MonteCarlo di opzioni la cui dinamica e' determinata da processi lognormali esatti o approssimati.                                                    #
+#                                                                                                                                                              #
+# Usage: ./Pricer                                                                                                                                              #
+# Speficicare: Dati di input del processo (MarketData), Dati di input dell'opzione (OptionData), tipo di Pay Off (guarda in PayOff.h per quelli implementati), #
+#             tipo di processo (guarda in StocasticProcess.h per quelli implementati) e se fare i calcoli su CPU o GPU.                                        #
+#                                                                                                                                                              #
+# Output: Prezzo stimato secondo il Pay Off specificato e corrispondente errore MonteCarlo.                                                                    #
+##############################################################################################################################################################*/
+
 #include <iostream>
 #include "Pricer.h"
 #include "Statistics.h"
@@ -8,10 +15,11 @@
 
 using namespace std;
 
+//## Funzione che gira su GPU che restituisce due vettori con sommme dei PayOff e dei PayOff quadrati. ##
+
 __global__ void Kernel(Seed* S, float* PayOffs, float* PayOffs2, int streams){
 
     int i = blockDim.x * blockIdx.x + threadIdx.x;
-//    int threads = blockDim.x * gridDim.x;
 
     MarketData MarketInput;
     MarketInput.Volatility=0.3;
@@ -34,13 +42,14 @@ __global__ void Kernel(Seed* S, float* PayOffs, float* PayOffs2, int streams){
     PayOffs2[i]=SumPayOff2;
 }
 
+//## Funzione che gira su CPU che restituisce due vettori con sommme dei PayOff e dei PayOff quadrati. ##
+
 __host__ void KernelSimulator(Seed* S, float* PayOffs, float* PayOffs2, int streams, int threads){
 
     MarketData MarketInput;
     MarketInput.Volatility=0.3;
     MarketInput.Drift=0.04;
     MarketInput.SInitial=100;
-
 
     OptionData OptionInput;
     OptionInput.TInitial=0;
@@ -57,16 +66,16 @@ __host__ void KernelSimulator(Seed* S, float* PayOffs, float* PayOffs2, int stre
         PayOffs[i]=SumPayOff;
         PayOffs2[i]=SumPayOff2;
     }
-
 }
 
 int main(){
+
     int streams=100;
     int threads=1024;
 
-    srand(657);
+//## Costruzione vettore dei seed. #############################################
 
-//    unsigned int *S = new unsigned int[4*threads];
+    srand(657);
     Seed *S= new Seed[threads];
     float *PayOffs = new float[threads];
     float *PayOffs2 = new float[threads];
@@ -78,11 +87,11 @@ int main(){
         S[i].S4=rand()+128;
 	}
 
-// Cuda
-
     float *_PayOffs;
     float *_PayOffs2;
     Seed *_S;
+
+//## Estrazione vettori dei PayOff su GPU. #####################################
 
     size_t sizeS = threads * sizeof(Seed);
     size_t sizePO = threads * sizeof(float);
@@ -98,16 +107,23 @@ int main(){
 
     Kernel<<<gridSize, blockSize>>>(_S, _PayOffs, _PayOffs2, streams);
 
-
-//    KernelSimulator(S, PayOffs, PayOffs2, streams, threads);
-
     cudaMemcpy(PayOffs, _PayOffs, sizePO, cudaMemcpyDeviceToHost);
     cudaMemcpy(PayOffs2, _PayOffs2, sizePO, cudaMemcpyDeviceToHost);
 
+//## Estrazione vettori dei PayOff su CPU. #####################################
+
+//    KernelSimulator(S, PayOffs, PayOffs2, streams, threads);
+
+//## Calcolo PayOff mediato ed errore monte carlo a partire dai vettori di PayOff estratti. ##
+
     Statistics Option(PayOffs, PayOffs2, threads, streams);
+
+//## Stampa a schermo dei valori. ##############################################
 
     cout<<"Prezzo: "<<Option.GetPrice()<<endl;
     cout<<"Errore MonteCarlo: "<<Option.GetMCError()<<endl;
+
+//## Liberazione memoria. ######################################################
 
     cudaFree(_PayOffs);
     cudaFree(_PayOffs2);

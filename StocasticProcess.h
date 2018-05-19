@@ -1,10 +1,14 @@
+/*########################################################################################
+# Classi che implementano i metodi per fare i singoli step temporali                     #
+# secondo processo esatto (ExactLogNormalProcess) o approssimato (EulerLogNormalProcess) #
+########################################################################################*/
+
 #ifndef _StocasticProcess_h_
 #define _StocasticProcess_h_
 
 class StocasticProcess{
 public:
-//  __host__ __device__ StocasticProcess();
-  __host__ __device__  virtual float Step(float S, float T, float w)=0;      //sottinteso step esatto (quando esiste)
+    __host__ __device__  virtual float Step(float S, float T, float w)=0;
 
 };
 
