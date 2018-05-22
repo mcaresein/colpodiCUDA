@@ -1,7 +1,7 @@
-/*###################################################
-# Classe che ha i metodi per il calcolo del PayOff  #
-# sommato e PayOff quadrato sommato (GetPrice).     #
-###################################################*/
+/*#####################################################
+# Classe che restituisce la somma e la somma quadrata #
+# dei Pay Off calcolati in uno stream (ComputePrice). #
+#####################################################*/
 
 #ifndef _Pricer_h_
 #define _Pricer_h_
@@ -12,14 +12,14 @@
 class MonteCarloPricer{
 public:
     __device__ __host__ MonteCarloPricer(MarketData ,OptionData , int, Seed);
-    __device__ __host__ void GetPrice();
-    __device__ __host__ float GetPayOff();
-    __device__ __host__ float GetPayOff2();
+    __device__ __host__ void ComputePrice();
+    __device__ __host__ double GetPayOff();
+    __device__ __host__ double GetPayOff2();
 private:
     MarketData _MarketInput;
     OptionData _OptionInput;
-    float _PayOff;
-    float _PayOff2;
+    double _PayOff;
+    double _PayOff2;
     int _NStreams;
     Seed _S;
 };

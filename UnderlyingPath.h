@@ -1,6 +1,6 @@
 /*#######################################################
-# Classe che implementa il metodo per costruire il path #
-# del prezzo dell'opzione (GetPath).                    #
+# Classe che implementa la simulazione dell'evoluzione  #
+# del prezzo del sottostante (GetPath)                  #
 #######################################################*/
 
 #ifndef _UnderlyingPath_h_
@@ -11,22 +11,22 @@
 
 class UnderlyingPath{
 public:
-  __host__ __device__  virtual float* GetPath()=0;
+  __host__ __device__  virtual double* GetPath()=0;
 };
 
 class MontecarloPath: public UnderlyingPath{
 public:
-  __host__ __device__  MontecarloPath(float, float, float,RandomGenerator*, StocasticProcess*, int);
+  __host__ __device__  MontecarloPath(double, double, double,RandomGenerator*, StocasticProcess*, int);
   __host__ __device__  ~MontecarloPath();
-  __host__ __device__  float* GetPath();
+  __host__ __device__  double* GetPath();
 
 private:
-    float* _UnderlyingPath;
+    double* _UnderlyingPath;
     RandomGenerator* _Generator;
     StocasticProcess* _Process;
-    float _TInitial;
-    float _SInitial;
-    float _TFinal;
+    double _TInitial;
+    double _SInitial;
+    double _TFinal;
     int _NSteps;
 };
 

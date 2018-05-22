@@ -23,7 +23,7 @@ __host__ __device__  unsigned int CombinedGenerator::TausStep(unsigned int seed,
 	return x;
 };
 
-__host__ __device__  float CombinedGenerator::Uniform(){
+__host__ __device__  double CombinedGenerator::Uniform(){
     _Sa=this->TausStep(_Sa, 13, 19, 12, 4294967294UL);
     _Sb=this->TausStep(_Sb, 2, 25, 4, 4294967288UL);
     _Sc=this->TausStep(_Sc, 3, 11, 17, 4294967280UL);
@@ -31,17 +31,17 @@ __host__ __device__  float CombinedGenerator::Uniform(){
     return 2.3283064365387e-10*(_Sa^_Sb^_Sc^_Sd);
 };
 
-__host__ __device__ float RandomGenerator::Gauss(){
+__host__ __device__ double RandomGenerator::Gauss(){
 
-        float u=this->Uniform();
-        float v=this->Uniform();
+        double u=this->Uniform();
+        double v=this->Uniform();
         return sqrt(-2.*log(u))*cos(2*M_PI*v);
 
 //## Stesso risultato ma calcolo ottimizzato per CPU. ##########################
 
-/*      float u=2.*this->Uniform()-1;
-        float v=2.*this->Uniform()-1;
-        float r=u*u+v*v;
+/*      double u=2.*this->Uniform()-1;
+        double v=2.*this->Uniform()-1;
+        double r=u*u+v*v;
         if(r==0 || r>=1) return this->Gauss();
         return u*sqrt(-2.*log(r)/r); */
 

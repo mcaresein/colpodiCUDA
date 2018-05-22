@@ -10,8 +10,8 @@
 
 class RandomGenerator{
 public:
-  __host__ __device__  virtual float Uniform()=0;
-  __host__ __device__  float Gauss();
+  __host__ __device__  virtual double Uniform()=0;
+  __host__ __device__  double Gauss();
 };
 
 class CombinedGenerator: public RandomGenerator{
@@ -19,7 +19,7 @@ public:
   __host__ __device__  CombinedGenerator(Seed);
   __host__ __device__  unsigned int LCGStep(unsigned int seed, unsigned int a, unsigned long b);
   __host__ __device__  unsigned int TausStep(unsigned int seed, unsigned int K1, unsigned int K2, unsigned int K3, unsigned long M);
-  __host__ __device__  float Uniform();
+  __host__ __device__  double Uniform();
 private:
   unsigned int _Sa, _Sb, _Sc, _Sd;
 };

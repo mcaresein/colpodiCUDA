@@ -11,11 +11,11 @@ struct Seed{
 };
 
 struct MarketData{
-    float Volatility, Drift, SInitial;
+    double Volatility, Drift, SInitial;
 };
 
 struct OptionData{
-    float TInitial, TFinal, StrikePrice;
+    double TInitial, TFinal, StrikePrice;
     int NSteps;
 };
 

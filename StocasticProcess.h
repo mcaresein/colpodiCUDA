@@ -1,31 +1,31 @@
-/*########################################################################################
-# Classi che implementano i metodi per fare i singoli step temporali                     #
-# secondo processo esatto (ExactLogNormalProcess) o approssimato (EulerLogNormalProcess) #
-########################################################################################*/
+/*####################################################################################################
+# Classi che implementano i metodi per simulare gli step temporali dell'evoluzione del prezzo del    #
+# sottostante secondo processo esatto (ExactLogNormalProcess) o approssimato (EulerLogNormalProcess) #
+####################################################################################################*/
 
 #ifndef _StocasticProcess_h_
 #define _StocasticProcess_h_
 
 class StocasticProcess{
 public:
-    __host__ __device__  virtual float Step(float S, float T, float w)=0;
+    __host__ __device__  virtual double Step(double, double, double)=0;
 
 };
 
 class ExactLogNormalProcess: public StocasticProcess{
 public:
-  __host__ __device__  ExactLogNormalProcess(float volatility, float drift);
-  __host__ __device__  float Step(float S, float T, float w);
+  __host__ __device__  ExactLogNormalProcess(double, double);
+  __host__ __device__  double Step(double ,double, double);
 private:
-  float _volatility, _drift;
+  double _volatility, _drift;
 };
 
 class EulerLogNormalProcess: public StocasticProcess{
 public:
-  __host__ __device__  EulerLogNormalProcess(float volatility, float drift);
-  __host__ __device__  float Step(float S, float T, float w);
+  __host__ __device__  EulerLogNormalProcess(double, double);
+  __host__ __device__  double Step(double, double, double);
 private:
-  float _volatility, _drift;
+  double _volatility, _drift;
 };
 
 #endif

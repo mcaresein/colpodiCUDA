@@ -1,6 +1,6 @@
 /*##########################################
 # Tipi di Payoff utilizzabili implementati #
-# nell' algoritmo.                         #
+# nella libreria.                          #
 ##########################################*/
 
 #ifndef _PayOff_h_
@@ -8,12 +8,18 @@
 
 class PayOff{
 public:
-    __device__ __host__  virtual float GetPayOff(float*, float, int)=0;
+    __device__ __host__  virtual double GetPayOff(double*, double, int)=0;
 };
 
-class PayOffPlainVanilla: public PayOff{
+class PayOffPlainVanillaCall: public PayOff{
 public:
-    __device__ __host__  float GetPayOff(float*, float, int);
+    __device__ __host__  double GetPayOff(double*, double, int);
+
+};
+
+class PayOffPlainVanillaPut: public PayOff{
+public:
+    __device__ __host__  double GetPayOff(double*, double, int);
 
 };
 
