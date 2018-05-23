@@ -60,8 +60,8 @@ void Allocation(unsigned int THREADS, bool cpu){
     cudaMalloc((void**)& _PayOffs2GPU, sizePO);
     cudaMalloc((void**)& _S, sizeS);
 };
-
-  void ~Allocation(){
+/*
+  void DeAllocation(){
     cudaFree(_PayOffsGPU);
     cudaFree(_PayOffs2GPU);
     cudaFree(_S);
@@ -72,5 +72,5 @@ void Allocation(unsigned int THREADS, bool cpu){
     delete[] PayOffs2CPU;
     delete[] S;
 };
-
+*/
 #endif

@@ -14,42 +14,13 @@
 #include "Pricer.h"
 #include "Statistics.h"
 #include "DataTypes.h"
+#include "MainFunctions.cu"
 
 #define STREAMS 5000
 #define THREADS 5120
 
 using namespace std;
 
-//## Funzione che gira su GPU che restituisce due vettori con sommme dei PayOff e dei PayOff quadrati. ##
-
-__global__ void Kernel(Seed* S, double* PayOffs, double* PayOffs2, int streams, MarketData MarketInput, OptionData OptionInput){
-
-    int i = blockDim.x * blockIdx.x + threadIdx.x;
-
-    MonteCarloPricer P(MarketInput, OptionInput, streams, S[i]);
-    P.ComputePrice();
-
-    double SumPayOff=P.GetPayOff();
-    double SumPayOff2=P.GetPayOff2();
-
-    PayOffs[i]=SumPayOff;
-    PayOffs2[i]=SumPayOff2;
-}
-
-//## Funzione che gira su CPU che restituisce due vettori con sommme dei PayOff e dei PayOff quadrati. ##
-
-__host__ void KernelSimulator(Seed* S, double* PayOffs, double* PayOffs2, int streams, MarketData MarketInput, OptionData OptionInput, int threads){
-
-    for(int i=0; i<threads; i++){
-        MonteCarloPricer P(MarketInput, OptionInput, streams, S[i]);
-        P.ComputePrice();
-        double SumPayOff=P.GetPayOff();
-        double SumPayOff2=P.GetPayOff2();
-
-        PayOffs[i]=SumPayOff;
-        PayOffs2[i]=SumPayOff2;
-    }
-}
 
 int main(){
 
@@ -67,6 +38,8 @@ int main(){
     OptionInput.StrikePrice=100;
 
 //## Allocazione di memoria. ###################################################
+
+    //Allocation(THREADS, CPU);
 
     double *PayOffsGPU = new double[THREADS];
     double *PayOffs2GPU = new double[THREADS];
@@ -90,10 +63,10 @@ int main(){
     srand(17*17);
 
     for(int i=0; i<THREADS; i++){
-        S[i].S1=rand()+128;
-        S[i].S2=rand()+128;
-        S[i].S3=rand()+128;
-        S[i].S4=rand()+128;
+        S[i].S1=rand()%(UINT_MAX-128)+128;
+        S[i].S2=rand()%(UINT_MAX-128)+128;
+        S[i].S3=rand()%(UINT_MAX-128)+128;
+        S[i].S4=rand();
     }
 
     cudaMemcpy(_S, S, sizeS, cudaMemcpyHostToDevice);
@@ -144,8 +117,10 @@ int main(){
     cout<<"Errore MonteCarlo: "<<OptionCPU.GetMCError()<<endl;
     cout<<"Tempo di calcolo: "<<duration*1000<<" ms"<<endl;
 
+
 //## Liberazione memoria. ######################################################
 
+    //DeAllocation();
     cudaFree(_PayOffsGPU);
     cudaFree(_PayOffs2GPU);
     cudaFree(_S);

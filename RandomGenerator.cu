@@ -10,25 +10,19 @@ __host__ __device__  CombinedGenerator::CombinedGenerator(Seed S){
     _Sd=S.S4;
 };
 
-__host__ __device__  unsigned int CombinedGenerator::LCGStep(unsigned int seed, unsigned int a, unsigned long b){
-	unsigned int x=(a*seed+b)%UINT_MAX;
+__host__ __device__  unsigned int CombinedGenerator::LCGStep(unsigned int &seed, unsigned int a, unsigned long b){
+	return seed=(a*seed+b)%UINT_MAX;
 
-	return x;
 };
 
-__host__ __device__  unsigned int CombinedGenerator::TausStep(unsigned int seed, unsigned int K1, unsigned int K2, unsigned int K3, unsigned long M){
+__host__ __device__  unsigned int CombinedGenerator::TausStep(unsigned int &seed, unsigned int K1, unsigned int K2, unsigned int K3, unsigned long M){
 	unsigned int b=(((seed<<K1)^seed)>>K2);
-  unsigned int x=(((seed&M)<<K3)^b);
+  return seed=(((seed&M)<<K3)^b);
 
-	return x;
 };
 
 __host__ __device__  double CombinedGenerator::Uniform(){
-    _Sa=this->TausStep(_Sa, 13, 19, 12, 4294967294UL);
-    _Sb=this->TausStep(_Sb, 2, 25, 4, 4294967288UL);
-    _Sc=this->TausStep(_Sc, 3, 11, 17, 4294967280UL);
-    _Sd=this->LCGStep(_Sd, 1664525, 1013904223UL);
-    return 2.3283064365387e-10*(_Sa^_Sb^_Sc^_Sd);
+    return 2.3283064365387e-10*(TausStep(_Sa, 13, 19, 12, 4294967294UL)^TausStep(_Sb, 2, 25, 4, 4294967288UL)^TausStep(_Sc, 3, 11, 17, 4294967280UL)^LCGStep(_Sd, 1664525, 1013904223UL));
 };
 
 __host__ __device__ double RandomGenerator::Gauss(){
