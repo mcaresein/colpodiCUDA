@@ -27,7 +27,7 @@ __host__ __device__  double CombinedGenerator::GetUniformRandomNumber(){
     return 2.3283064365387e-10*(TausStep(_Sa, 13, 19, 12, 4294967294UL)^TausStep(_Sb, 2, 25, 4, 4294967288UL)^TausStep(_Sc, 3, 11, 17, 4294967280UL)^LCGStep(_Sd, 1664525, 1013904223UL));
 };
 
-__host__ __device__ double CombinedGenerator::GetGaussianRandomNumber(){
+__host__ __device__ double RandomGenerator::GetGaussianRandomNumber(){
 
         if(_Status==true){
               double u=this->GetUniformRandomNumber();
@@ -51,8 +51,4 @@ __host__ __device__ double CombinedGenerator::GetGaussianRandomNumber(){
             _Status=true;
             return _SavedRandomNumber;
         }
-
-//        double u=this->GetUniformRandomNumber();
-//        double v=this->GetUniformRandomNumber();
-//        return sqrt(-2.*log(u))*cos(2*M_PI*v);
 };
