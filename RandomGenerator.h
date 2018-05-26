@@ -11,7 +11,10 @@
 class RandomGenerator{
 public:
   __host__ __device__  virtual double GetUniformRandomNumber()=0;
-  __host__ __device__  virtual double GetGaussianRandomNumber()=0;
+  __host__ __device__  virtual double GetGaussianRandomNumber();
+protected:
+  bool _Status, _GPU;
+  double _SavedRandomNumber;
 };
 
 class CombinedGenerator: public RandomGenerator{
@@ -20,11 +23,8 @@ public:
   __host__ __device__  unsigned int LCGStep(unsigned int &, unsigned int , unsigned long );
   __host__ __device__  unsigned int TausStep(unsigned int &, unsigned int , unsigned int , unsigned int , unsigned long );
   __host__ __device__  double GetUniformRandomNumber();
-  __host__ __device__  double GetGaussianRandomNumber();
-protected:
+private:
   unsigned int _Sa, _Sb, _Sc, _Sd;
-  double _SavedRandomNumber;
-  bool _Status, _GPU;
 };
 
 #endif
