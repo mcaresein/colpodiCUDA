@@ -8,6 +8,7 @@
 
 #include "RandomGenerator.h"
 #include "StocasticProcess.h"
+#include "Option.h"
 
 class UnderlyingPath{
 public:
@@ -16,7 +17,7 @@ public:
 
 class MontecarloPath: public UnderlyingPath{
 public:
-  __host__ __device__  MontecarloPath(double, double, double,RandomGenerator*, StocasticProcess*, int);
+  __host__ __device__  MontecarloPath(double, Option* ,RandomGenerator*, StocasticProcess*);
   __host__ __device__  ~MontecarloPath();
   __host__ __device__  double* GetPath();
 
@@ -24,10 +25,8 @@ private:
     double* _UnderlyingPath;
     RandomGenerator* _Generator;
     StocasticProcess* _Process;
-    double _TInitial;
-    double _SInitial;
-    double _TFinal;
-    int _NSteps;
+    double _EquityInitialPrice;
+    Option* _Option;
 };
 
 #endif

@@ -1,5 +1,10 @@
 #include "Statistics.h"
 #include <cmath>
+#include <iostream>
+#include <string>
+#include <fstream>
+
+using namespace std;
 
 __host__ Statistics::Statistics(double* Values, double* Values2, int DimThreads, int DimStreams){
 
@@ -22,3 +27,16 @@ __host__ double Statistics::GetMCError(){
 	return _MCError;
 
 };
+
+__host__ void Statistics::Print(){
+	cout<<"Prezzo: "<<this->GetPrice()<<endl;
+    cout<<"Errore MonteCarlo: "<<this->GetMCError()<<endl;
+}
+
+__host__ void Statistics::Print(std::string path){
+	ofstream output;
+	output.open(path.c_str());
+	output<<"Prezzo: "<<this->GetPrice()<<endl;
+    output<<"Errore MonteCarlo: "<<this->GetMCError()<<endl;
+	output.close();
+}

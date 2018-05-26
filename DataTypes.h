@@ -11,12 +11,12 @@ struct Seed{
 };
 
 struct MarketData{
-    double Volatility, Drift, SInitial;
+    double Volatility, Drift, EquityInitialPrice;
 };
 
 struct OptionData{
-    double TInitial, TFinal, StrikePrice;
-    int NSteps;
+    double TInitial, MaturityDate, StrikePrice;
+    int NumberOfDatesToSimulate;
 };
 
 #endif

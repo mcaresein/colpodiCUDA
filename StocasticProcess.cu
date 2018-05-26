@@ -9,7 +9,7 @@ __host__ __device__  ExactLogNormalProcess::ExactLogNormalProcess(double volatil
 };
 
 __host__ __device__  double ExactLogNormalProcess::Step(double S, double T, double w){
-  return S*exp((_drift - pow(_volatility,2)/2)*T + _volatility*sqrt(T)*w);
+  return S*exp((_drift - (_volatility*_volatility)/2)*T + _volatility*sqrt(T)*w);
 };
 
 __host__ __device__  EulerLogNormalProcess::EulerLogNormalProcess(double volatility, double drift){

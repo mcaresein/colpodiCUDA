@@ -11,31 +11,49 @@
 #include <iostream>
 #include <cstdio>
 #include <ctime>
-#include "Pricer.h"
+#include <fstream>
+#include <string>
+#include "MonteCarloPricer.h"
 #include "Statistics.h"
 #include "DataTypes.h"
 #include "MainFunctions.cu"
 
-#define STREAMS 5000
-#define THREADS 5120
-
 using namespace std;
-
 
 int main(){
 
 //## Inizializzazione parametri di mercato e opzione. ##########################
 
+
+//######## reader da scorporare ###########
+
+    fstream file("DATA/input.conf");
+    string line;
+    double data[9];
+    int i=0;
+    while (getline(file, line)){
+        if (line[0] == '#') continue;
+        data[i]=atof(line.c_str());
+        i++;
+    }
+    file.close();
+
+    int THREADS=data[0];
+    int STREAMS=data[1];
+
     MarketData MarketInput;
-    MarketInput.Volatility=0.3;
-    MarketInput.Drift=0.04;
-    MarketInput.SInitial=100;
+    MarketInput.Volatility=data[2];
+    MarketInput.Drift=data[3];
+    MarketInput.EquityInitialPrice=data[4];
 
     OptionData OptionInput;
-    OptionInput.TInitial=0;
-    OptionInput.TFinal=1;
-    OptionInput.NSteps=12;
-    OptionInput.StrikePrice=100;
+    OptionInput.TInitial=data[5];
+    OptionInput.MaturityDate=data[6];
+    OptionInput.NumberOfDatesToSimulate=data[7];
+    OptionInput.StrikePrice=data[8];
+
+//########### end reader ##########
+
 
 //## Allocazione di memoria. ###################################################
 
@@ -45,31 +63,31 @@ int main(){
     double *PayOffs2GPU = new double[THREADS];
     double *PayOffsCPU = new double[THREADS];
     double *PayOffs2CPU = new double[THREADS];
-    Seed *S= new Seed[THREADS];
+    Seed *SeedVector= new Seed[THREADS];
 
     double *_PayOffsGPU;
     double *_PayOffs2GPU;
-    Seed *_S;
+    Seed *_SeedVector;
 
-    size_t sizeS = THREADS * sizeof(Seed);
+    size_t sizeSeedVector = THREADS * sizeof(Seed);
     size_t sizePO = THREADS * sizeof(double);
 
     cudaMalloc((void**)& _PayOffsGPU, sizePO);
     cudaMalloc((void**)& _PayOffs2GPU, sizePO);
-    cudaMalloc((void**)& _S, sizeS);
+    cudaMalloc((void**)& _SeedVector, sizeSeedVector);
 
 //## Costruzione vettore dei seed. #############################################
 
     srand(17*17);
 
     for(int i=0; i<THREADS; i++){
-        S[i].S1=rand()%(UINT_MAX-128)+128;
-        S[i].S2=rand()%(UINT_MAX-128)+128;
-        S[i].S3=rand()%(UINT_MAX-128)+128;
-        S[i].S4=rand();
+        SeedVector[i].S1=rand()%(UINT_MAX-128)+128;
+        SeedVector[i].S2=rand()%(UINT_MAX-128)+128;
+        SeedVector[i].S3=rand()%(UINT_MAX-128)+128;
+        SeedVector[i].S4=rand();
     }
 
-    cudaMemcpy(_S, S, sizeS, cudaMemcpyHostToDevice);
+    cudaMemcpy(_SeedVector, SeedVector, sizeSeedVector, cudaMemcpyHostToDevice);
 
 //## Calcolo dei PayOff su GPU. ################################################
 
@@ -81,7 +99,7 @@ int main(){
     cudaEventCreate(&stop);
 
     cudaEventRecord(start);
-    Kernel<<<gridSize, blockSize>>>(_S, _PayOffsGPU, _PayOffs2GPU, STREAMS, MarketInput, OptionInput);
+    Kernel<<<gridSize, blockSize>>>(_SeedVector, _PayOffsGPU, _PayOffs2GPU, STREAMS, MarketInput, OptionInput);
     cudaEventRecord(stop);
 
     cudaMemcpy(PayOffsGPU, _PayOffsGPU, sizePO, cudaMemcpyDeviceToHost);
@@ -97,7 +115,7 @@ int main(){
     double duration;
 
     startcpu = clock();
-    KernelSimulator(S, PayOffsCPU, PayOffs2CPU, STREAMS, MarketInput, OptionInput, THREADS);
+    KernelSimulator(SeedVector, PayOffsCPU, PayOffs2CPU, STREAMS, MarketInput, OptionInput, THREADS);
     duration = (clock() - startcpu ) / (double) CLOCKS_PER_SEC;
 
 //## Calcolo PayOff ed errore monte carlo a partire dai valori di PayOff simulati. ##
@@ -105,16 +123,16 @@ int main(){
     Statistics OptionGPU(PayOffsGPU, PayOffs2GPU, THREADS, STREAMS);
     Statistics OptionCPU(PayOffsCPU, PayOffs2CPU, THREADS, STREAMS);
 
-//## Stampa a schermo dei valori. ##############################################
+//## Stampa su file dei valori. ##############################################
 
     cout<<"Valori GPU"<<endl;
-    cout<<"Prezzo: "<<OptionGPU.GetPrice()<<endl;
-    cout<<"Errore MonteCarlo: "<<OptionGPU.GetMCError()<<endl;
+    OptionGPU.Print();
+    OptionGPU.Print("DATA/outputGPU.dat");
     cout<<"Tempo di calcolo: "<<milliseconds<<" ms"<<endl<<endl;
 
     cout<<"Valori CPU"<<endl;
-    cout<<"Prezzo: "<<OptionCPU.GetPrice()<<endl;
-    cout<<"Errore MonteCarlo: "<<OptionCPU.GetMCError()<<endl;
+    OptionCPU.Print();
+    OptionCPU.Print("DATA/outputCPU.dat");
     cout<<"Tempo di calcolo: "<<duration*1000<<" ms"<<endl;
 
 
@@ -123,13 +141,13 @@ int main(){
     //DeAllocation();
     cudaFree(_PayOffsGPU);
     cudaFree(_PayOffs2GPU);
-    cudaFree(_S);
+    cudaFree(_SeedVector);
 
     delete[] PayOffsGPU;
     delete[] PayOffsCPU;
     delete[] PayOffs2GPU;
     delete[] PayOffs2CPU;
-    delete[] S;
+    delete[] SeedVector;
 
     return 0;
 }

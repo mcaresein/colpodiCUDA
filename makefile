@@ -1,9 +1,9 @@
 all: main
 
-main: main.o RandomGenerator.o StocasticProcess.o UnderlyingPath.o PayOff.o Pricer.o Statistics.o
-	nvcc -gencode arch=compute_20,code=sm_20 main.o RandomGenerator.o StocasticProcess.o UnderlyingPath.o PayOff.o Pricer.o Statistics.o -o Pricer
+main: main.o RandomGenerator.o StocasticProcess.o UnderlyingPath.o Option.o MonteCarloPricer.o Statistics.o
+	nvcc -gencode arch=compute_20,code=sm_20 main.o RandomGenerator.o StocasticProcess.o UnderlyingPath.o Option.o MonteCarloPricer.o Statistics.o -o Pricer
 
-main.o: main.cu Pricer.h Statistics.h DataTypes.h
+main.o: main.cu MonteCarloPricer.h Statistics.h DataTypes.h
 	nvcc -gencode arch=compute_20,code=sm_20 -dc main.cu -o main.o -I.
 
 RandomGenerator.o: RandomGenerator.cu RandomGenerator.h
@@ -15,11 +15,11 @@ StocasticProcess.o: StocasticProcess.cu StocasticProcess.h
 UnderlyingPath.o: UnderlyingPath.cu UnderlyingPath.h
 	nvcc -gencode arch=compute_20,code=sm_20 -dc UnderlyingPath.cu -o UnderlyingPath.o -I.
 
-PayOff.o: PayOff.cu PayOff.h
-	nvcc -gencode arch=compute_20,code=sm_20 -dc PayOff.cu -o PayOff.o -I.
+Option.o: Option.cu Option.h
+	nvcc -gencode arch=compute_20,code=sm_20 -dc Option.cu -o Option.o -I.
 
-Pricer.o: Pricer.cu Pricer.h RandomGenerator.h StocasticProcess.h UnderlyingPath.h PayOff.h
-	nvcc -gencode arch=compute_20,code=sm_20 -dc Pricer.cu -o Pricer.o -I.
+MonteCarloPricer.o: MonteCarloPricer.cu MonteCarloPricer.h RandomGenerator.h StocasticProcess.h UnderlyingPath.h Option.h
+	nvcc -gencode arch=compute_20,code=sm_20 -dc MonteCarloPricer.cu -o MonteCarloPricer.o -I.
 
 Statistics.o: Statistics.cu Statistics.h
 	nvcc -gencode arch=compute_20,code=sm_20 -dc Statistics.cu -o Statistics.o -I.
