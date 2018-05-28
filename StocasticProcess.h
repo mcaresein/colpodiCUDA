@@ -8,24 +8,24 @@
 
 class StocasticProcess{
 public:
-    __host__ __device__  virtual double Step(double, double, double)=0;
+    __host__ __device__  virtual double Step(double InitialPrice, double TimeStep, double RandomNumber)=0;
 
 };
 
 class ExactLogNormalProcess: public StocasticProcess{
 public:
-  __host__ __device__  ExactLogNormalProcess(double, double);
-  __host__ __device__  double Step(double ,double, double);
+  __host__ __device__  ExactLogNormalProcess(double Volatility, double Drift);
+  __host__ __device__  double Step(double InitialPrice, double TimeStep, double RandomNumber);
 private:
-  double _volatility, _drift;
+  double _Volatility, _Drift;
 };
 
 class EulerLogNormalProcess: public StocasticProcess{
 public:
-  __host__ __device__  EulerLogNormalProcess(double, double);
-  __host__ __device__  double Step(double, double, double);
+  __host__ __device__  EulerLogNormalProcess(double Volatility, double Drift);
+  __host__ __device__  double Step(double InitialPrice, double TimeStep, double RandomNumber);
 private:
-  double _volatility, _drift;
+  double _Volatility, _Drift;
 };
 
 #endif

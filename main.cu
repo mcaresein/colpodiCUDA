@@ -11,12 +11,11 @@
 #include <iostream>
 #include <cstdio>
 #include <ctime>
-#include <fstream>
-#include <string>
 #include "MonteCarloPricer.h"
 #include "Statistics.h"
 #include "DataTypes.h"
-#include "MainFunctions.cu"
+#include "KernelFunctions.cu"
+#include "Utilities.cu"
 
 using namespace std;
 
@@ -24,40 +23,15 @@ int main(){
 
 //## Inizializzazione parametri di mercato e opzione. ##########################
 
-
-//######## reader da scorporare ###########
-
-    fstream file("DATA/input.conf");
-    string line;
-    double data[9];
-    int i=0;
-    while (getline(file, line)){
-        if (line[0] == '#') continue;
-        data[i]=atof(line.c_str());
-        i++;
-    }
-    file.close();
-
-    int THREADS=data[0];
-    int STREAMS=data[1];
+    int THREADS;
+    int STREAMS;
 
     MarketData MarketInput;
-    MarketInput.Volatility=data[2];
-    MarketInput.Drift=data[3];
-    MarketInput.EquityInitialPrice=data[4];
-
     OptionData OptionInput;
-    OptionInput.TInitial=data[5];
-    OptionInput.MaturityDate=data[6];
-    OptionInput.NumberOfDatesToSimulate=data[7];
-    OptionInput.StrikePrice=data[8];
 
-//########### end reader ##########
-
+    Reader(MarketInput, OptionInput, THREADS, STREAMS);
 
 //## Allocazione di memoria. ###################################################
-
-    //Allocation(THREADS, CPU);
 
     double *PayOffsGPU = new double[THREADS];
     double *PayOffs2GPU = new double[THREADS];
@@ -78,14 +52,7 @@ int main(){
 
 //## Costruzione vettore dei seed. #############################################
 
-    srand(17*17);
-
-    for(int i=0; i<THREADS; i++){
-        SeedVector[i].S1=rand()%(UINT_MAX-128)+128;
-        SeedVector[i].S2=rand()%(UINT_MAX-128)+128;
-        SeedVector[i].S3=rand()%(UINT_MAX-128)+128;
-        SeedVector[i].S4=rand();
-    }
+    GetSeeds(SeedVector, THREADS);
 
     cudaMemcpy(_SeedVector, SeedVector, sizeSeedVector, cudaMemcpyHostToDevice);
 
@@ -138,7 +105,6 @@ int main(){
 
 //## Liberazione memoria. ######################################################
 
-    //DeAllocation();
     cudaFree(_PayOffsGPU);
     cudaFree(_PayOffs2GPU);
     cudaFree(_SeedVector);

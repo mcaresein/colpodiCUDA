@@ -20,7 +20,7 @@ __device__ __host__ MonteCarloPricer::MonteCarloPricer(MarketData MarketInput, O
 
 __device__ __host__ void MonteCarloPricer::ComputePrice(){
 
-    MontecarloPath Path(_MarketInput.EquityInitialPrice, _Option , _Generator, _Process);
+    MontecarloPath Path(_MarketInput.EquityInitialPrice, _Option->GetMaturityDate(), _Option->GetTInitial(), _Option->GetNumberOfDatesToSimulate(), _Generator, _Process);
 
     for(int j=0; j<_NStreams; j++){
         double* value=new double[_Option->GetNumberOfDatesToSimulate()];
@@ -29,9 +29,6 @@ __device__ __host__ void MonteCarloPricer::ComputePrice(){
         _PayOff+=payoff;
         _PayOff2+=payoff*payoff;
     }
-    _PayOff=_PayOff;
-    _PayOff2=_PayOff2;
-
 };
 
 __device__ __host__ double MonteCarloPricer::GetPayOff(){

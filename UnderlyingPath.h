@@ -17,7 +17,7 @@ public:
 
 class MontecarloPath: public UnderlyingPath{
 public:
-  __host__ __device__  MontecarloPath(double, Option* ,RandomGenerator*, StocasticProcess*);
+  __host__ __device__  MontecarloPath(double, double, double, int ,RandomGenerator*, StocasticProcess*);
   __host__ __device__  ~MontecarloPath();
   __host__ __device__  double* GetPath();
 
@@ -26,7 +26,9 @@ private:
     RandomGenerator* _Generator;
     StocasticProcess* _Process;
     double _EquityInitialPrice;
-    Option* _Option;
+    double _MaturityDate;
+    double _TInitial;
+    int _NumberOfDatesToSimulate;
 };
 
 #endif
