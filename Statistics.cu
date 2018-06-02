@@ -12,7 +12,6 @@ __host__ HostStatistics::HostStatistics(DevStatistics* PayOffs, int DimThreads, 
 	int N=DimThreads*DimStreams;
 
 	for(int i=0; i<DimThreads; i++){
-//		if(i<20) cout<<PayOffs[i].GetPayOffs()<<endl;
 		SumP += PayOffs[i].GetPayOffs();
 		SumP2 += PayOffs[i].GetPayOffs2();
 	}
