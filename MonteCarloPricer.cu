@@ -8,8 +8,6 @@
 
 __device__ __host__ MonteCarloPricer::MonteCarloPricer(MarketData MarketInput, Option* Option , RandomGenerator* Generator, StocasticProcess* Process, int NStreams){
     _MarketInput=MarketInput;
-    _PayOff=0;
-    _PayOff2=0;
     _NStreams=NStreams;
     _Generator=Generator;
     _Option=Option;
@@ -18,7 +16,7 @@ __device__ __host__ MonteCarloPricer::MonteCarloPricer(MarketData MarketInput, O
 
 //## Metodo per il calcolo delle somme semplici e quadrate dei PayOff simulati in uno stream. ##
 
-__device__ __host__ void MonteCarloPricer::ComputePrice(){
+__device__ __host__ void MonteCarloPricer::ComputePrice(DevStatistics* PayOffs){
 
     MontecarloPath Path(_MarketInput.EquityInitialPrice, _Option->GetMaturityDate(), _Option->GetTInitial(), _Option->GetNumberOfDatesToSimulate(), _Generator, _Process);
 
@@ -26,15 +24,6 @@ __device__ __host__ void MonteCarloPricer::ComputePrice(){
         double* value=new double[_Option->GetNumberOfDatesToSimulate()];
         value=Path.GetPath();
         double payoff=_Option->GetPayOff(value);
-        _PayOff+=payoff;
-        _PayOff2+=payoff*payoff;
+        PayOffs->AddValue(payoff);
     }
-};
-
-__device__ __host__ double MonteCarloPricer::GetPayOff(){
-    return _PayOff;
-};
-
-__device__ __host__ double MonteCarloPricer::GetPayOff2(){
-    return _PayOff2;
 };

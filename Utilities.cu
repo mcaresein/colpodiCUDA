@@ -40,3 +40,21 @@ void GetSeeds(Seed* SeedVector, int THREADS){
         SeedVector[i].S4=rand();
     }
 };
+
+void MemoryAllocation(DevStatistics** PayOffsGPU, DevStatistics** PayOffsCPU, Seed** SeedVector, DevStatistics** _PayOffsGPU, Seed** _SeedVector, size_t sizeSeedVector, size_t sizeDevStVector, int THREADS){
+    *PayOffsGPU=new DevStatistics[THREADS];
+    *PayOffsCPU = new DevStatistics[THREADS];
+    *SeedVector= new Seed[THREADS];
+
+    cudaMalloc((void**)& *_PayOffsGPU, sizeDevStVector);
+    cudaMalloc((void**)& *_SeedVector, sizeSeedVector);
+};
+
+void MemoryDeallocation(DevStatistics* PayOffsGPU, DevStatistics* PayOffsCPU, Seed* SeedVector, DevStatistics* _PayOffsGPU, Seed* _SeedVector){
+    delete[] PayOffsGPU;
+    delete[] PayOffsCPU;
+    delete[] SeedVector;
+
+    cudaFree(_PayOffsGPU);
+    cudaFree(_SeedVector);
+};

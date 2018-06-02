@@ -11,19 +11,15 @@
 #include "DataTypes.h"
 #include "Option.h"
 #include "StocasticProcess.h"
-
+#include "Statistics.h"
 
 class MonteCarloPricer{
 public:
     __device__ __host__ MonteCarloPricer(MarketData ,Option*, RandomGenerator*, StocasticProcess* , int);
-    __device__ __host__ void ComputePrice();
-    __device__ __host__ double GetPayOff();
-    __device__ __host__ double GetPayOff2();
+    __device__ __host__ void ComputePrice(DevStatistics*);
 private:
     MarketData _MarketInput;
     Option* _Option;
-    double _PayOff;
-    double _PayOff2;
     int _NStreams;
     RandomGenerator* _Generator;
     StocasticProcess* _Process;

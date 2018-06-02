@@ -10,34 +10,49 @@
 
 /*############################ Kernel Functions ############################*/
 
-__host__ __device__ void TrueKernel(Seed* SeedVector, double* PayOffs, double* PayOffs2, int streams, MarketData MarketInput, OptionData OptionInput, int cont){
+__host__ __device__ void TrueKernel(Seed* SeedVector, DevStatistics* PayOffs, int streams, MarketData MarketInput, OptionData OptionInput, int cont){
 
-  RandomGenerator* Generator= new CombinedGenerator(SeedVector[cont], true);
-  Option* Option=new OptionPlainVanillaCall(OptionInput);
-  StocasticProcess* Process=new ExactLogNormalProcess(MarketInput.Volatility, MarketInput.Drift);
+    RandomGenerator* Generator= new CombinedGenerator(SeedVector[cont], true);
+    Option* Option=new OptionPlainVanillaCall(OptionInput);
+    StocasticProcess* Process=new ExactLogNormalProcess(MarketInput.Volatility, MarketInput.Drift);
 
+    MonteCarloPricer Pricer(MarketInput, Option, Generator, Process, streams);
 
-  MonteCarloPricer Pricer(MarketInput, Option, Generator, Process, streams);
-  Pricer.ComputePrice();
-
-  PayOffs[cont]=Pricer.GetPayOff();
-  PayOffs2[cont]=Pricer.GetPayOff2();
-
+//    DevStatistics* temp=new DevStatistics;  non va
+    Pricer.ComputePrice(&temp);
+//  Pricer.ComputePrice(&PayOffs[cont]);  perchè non va???
+    PayOffs[cont]=temp;
 }
 
-__global__ void Kernel(Seed* SeedVector, double* PayOffs, double* PayOffs2, int streams, MarketData MarketInput, OptionData OptionInput){
+__global__ void Kernel(Seed* SeedVector, DevStatistics* PayOffs, int streams, MarketData MarketInput, OptionData OptionInput){
 
     int i = blockDim.x * blockIdx.x + threadIdx.x;
 
-    TrueKernel(SeedVector, PayOffs, PayOffs2, streams, MarketInput, OptionInput, i);
+    TrueKernel(SeedVector,PayOffs, streams, MarketInput, OptionInput, i);
 };
 
 //## Funzione che gira su CPU che restituisce due vettori con sommme dei PayOff e dei PayOff quadrati. ##
 
-__host__ void KernelSimulator(Seed* SeedVector, double* PayOffs, double* PayOffs2, int streams, MarketData MarketInput, OptionData OptionInput, int threads){
+__host__ void KernelSimulator(Seed* SeedVector, DevStatistics* PayOffs, int streams, MarketData MarketInput, OptionData OptionInput, int threads){
 
-    for(int i=0; i<threads; i++) TrueKernel(SeedVector, PayOffs, PayOffs2, streams, MarketInput, OptionInput, i);
+    for(int i=0; i<threads; i++) TrueKernel(SeedVector, PayOffs, streams, MarketInput, OptionInput, i);
 
 };
+
+/*
+__global__ void Kernel(Seed* SeedVector, DevStatistics* PayOffs, int streams, MarketData MarketInput, OptionData OptionInput){
+
+    int i = blockDim.x * blockIdx.x + threadIdx.x;
+
+    RandomGenerator* Generator= new CombinedGenerator(SeedVector[i], true);
+    Option* Option=new OptionPlainVanillaCall(OptionInput);
+    StocasticProcess* Process=new ExactLogNormalProcess(MarketInput.Volatility, MarketInput.Drift);
+
+    MonteCarloPricer Pricer(MarketInput, Option, Generator, Process, streams);
+    DevStatistics temp;
+    Pricer.ComputePrice(&temp);
+    PayOffs[i]=temp;
+};
+*/
 
 #endif

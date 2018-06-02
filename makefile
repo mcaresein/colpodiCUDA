@@ -1,7 +1,7 @@
 all: main
 
 main: main.o RandomGenerator.o StocasticProcess.o UnderlyingPath.o Option.o MonteCarloPricer.o Statistics.o
-	nvcc -gencode arch=compute_20,code=sm_20 main.o RandomGenerator.o StocasticProcess.o UnderlyingPath.o Option.o MonteCarloPricer.o Statistics.o -o Pricer
+	nvcc -gencode arch=compute_20,code=sm_20 main.o RandomGenerator.o StocasticProcess.o UnderlyingPath.o Option.o MonteCarloPricer.o Statistics.o -o pricer.x
 
 main.o: main.cu MonteCarloPricer.h Statistics.h DataTypes.h
 	nvcc -gencode arch=compute_20,code=sm_20 -dc main.cu -o main.o -I.
