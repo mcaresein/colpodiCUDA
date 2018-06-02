@@ -19,6 +19,7 @@ __host__ __device__ void TrueKernel(Seed* SeedVector, DevStatistics* PayOffs, in
     MonteCarloPricer Pricer(MarketInput, Option, Generator, Process, streams);
 
 //    DevStatistics* temp=new DevStatistics;  non va
+    DevStatistics temp;
     Pricer.ComputePrice(&temp);
 //  Pricer.ComputePrice(&PayOffs[cont]);  perchè non va???
     PayOffs[cont]=temp;
