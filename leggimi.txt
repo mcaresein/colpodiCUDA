@@ -1,4 +1,0 @@
-PER USARE IL PROGRAMMA (e dico soprattutto a Michele che poi si lamenta che non va):
-Mettere il file di input in una cartella DATA/input.conf (vedi main.cu per implementazione).
-Rimane da scoprire come mai è così lento (prestazioni perggiorate del 50%) dopo aver modificato la classe 
-MonteCarloPricer in modo che prenda un oggetto RandomGenerator invece di crearlo. (?????)
