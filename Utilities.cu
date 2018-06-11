@@ -4,10 +4,10 @@
 
 using namespace std;
 
-void Reader(MarketData &MarketInput, OptionData &OptionInput, int &THREADS, int &STREAMS){
+void Reader(MarketData &MarketInput, OptionData &OptionInput, int &THREADS, int &STREAMS, SimulationParameters &Parameters){
     fstream file("DATA/input.conf");
     string line;
-    double data[9];
+    double data[14];
     int i=0;
     while (getline(file, line)){
         if (line[0] == '#') continue;
@@ -18,15 +18,21 @@ void Reader(MarketData &MarketInput, OptionData &OptionInput, int &THREADS, int 
 
     THREADS=data[0];
     STREAMS=data[1];
+    bool EulerApproximation=data[2];
+    Parameters.EulerApprox=EulerApproximation;
+    Parameters.OptionType=data[3];
 
-    MarketInput.Volatility=data[2];
-    MarketInput.Drift=data[3];
-    MarketInput.EquityInitialPrice=data[4];
+    MarketInput.Volatility=data[4];
+    MarketInput.Drift=data[5];
+    MarketInput.EquityInitialPrice=data[6];
 
-    OptionInput.TInitial=data[5];
-    OptionInput.MaturityDate=data[6];
-    OptionInput.NumberOfDatesToSimulate=data[7];
-    OptionInput.StrikePrice=data[8];
+    OptionInput.TInitial=data[7];
+    OptionInput.MaturityDate=data[8];
+    OptionInput.NumberOfDatesToSimulate=data[9];
+    OptionInput.StrikePrice=data[10];
+    OptionInput.K=data[11];
+    OptionInput.N=data[12];
+    OptionInput.B=data[13];
 };
 
 void GetSeeds(Seed* SeedVector, int THREADS){

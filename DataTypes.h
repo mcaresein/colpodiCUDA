@@ -15,8 +15,13 @@ struct MarketData{
 };
 
 struct OptionData{
-    double TInitial, MaturityDate, StrikePrice;
+    double TInitial, MaturityDate, StrikePrice, B, N, K;
     int NumberOfDatesToSimulate;
+};
+
+struct SimulationParameters{
+    int OptionType;
+    bool EulerApprox;
 };
 
 #endif

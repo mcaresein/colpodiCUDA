@@ -28,8 +28,9 @@ int main(){
 
     MarketData MarketInput;
     OptionData OptionInput;
+    SimulationParameters Parameters;
 
-    Reader(MarketInput, OptionInput, THREADS, STREAMS);
+    Reader(MarketInput, OptionInput, THREADS, STREAMS, Parameters);
 
 //## Allocazione di memoria. ###################################################
 
@@ -53,7 +54,7 @@ int main(){
 
 //## Calcolo dei PayOff su GPU. ################################################
 
-    int blockSize=512;
+    int blockSize=256;
     int gridSize = (THREADS + blockSize - 1) / blockSize;
 
     cudaEvent_t start, stop;
@@ -61,7 +62,7 @@ int main(){
     cudaEventCreate(&stop);
 
     cudaEventRecord(start);
-    Kernel<<<gridSize, blockSize>>>(_SeedVector, _PayOffsGPU, STREAMS, MarketInput, OptionInput);
+    Kernel<<<gridSize, blockSize>>>(_SeedVector, _PayOffsGPU, STREAMS, MarketInput, OptionInput, Parameters);
     cudaEventRecord(stop);
 
     cudaMemcpy(PayOffsGPU, _PayOffsGPU, sizeDevStVector, cudaMemcpyDeviceToHost);
@@ -76,7 +77,7 @@ int main(){
     double duration;
 
     startcpu = clock();
-    KernelSimulator(SeedVector, PayOffsCPU, STREAMS, MarketInput, OptionInput, THREADS);
+    KernelSimulator(SeedVector, PayOffsCPU, STREAMS, MarketInput, OptionInput, Parameters, THREADS);
     duration = (clock() - startcpu ) / (double) CLOCKS_PER_SEC;
 
 //## Calcolo PayOff ed errore monte carlo a partire dai valori di PayOff simulati. ##
