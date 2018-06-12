@@ -18,6 +18,12 @@ protected:
     OptionData _OptionInput;
 };
 
+class OptionForward: public Option{
+public:
+    __device__ __host__ OptionForward(OptionData);
+    __device__ __host__  double GetPayOff(double*);
+};
+
 class OptionPlainVanillaCall: public Option{
 public:
     __device__ __host__ OptionPlainVanillaCall(OptionData);
@@ -28,6 +34,14 @@ class OptionPlainVanillaPut: public Option{
 public:
     __device__ __host__ OptionPlainVanillaPut(OptionData);
     __device__ __host__  double GetPayOff(double*);
+};
+
+class OptionAbsolutePerformanceBarrier: public Option{
+public:
+    __device__ __host__ OptionAbsolutePerformanceBarrier(OptionData, double Volatility);
+    __device__ __host__  double GetPayOff(double*);
+private:
+    double _Volatility;
 };
 
 #endif
