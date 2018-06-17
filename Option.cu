@@ -1,57 +1,58 @@
 #include <cmath>
 #include "Option.h"
 
-__host__ __device__ Option::Option(OptionData OptionInput){
+__host__ __device__ Option::Option(OptionData OptionInput, MontecarloPath* Path){
     _OptionInput = OptionInput;
+    _Path = Path;
 };
 
 __host__ __device__ int Option::GetNumberOfDatesToSimulate(){
     return _OptionInput.NumberOfDatesToSimulate;
 };
 
-__host__ __device__ double Option::GetTInitial(){
-    return _OptionInput.TInitial;
-};
+//__host__ __device__ int Option::GetEulerSubStep(){
+//    return _OptionInput.EulerSubStep;
+//};
 
-__host__ __device__ double Option::GetMaturityDate(){
-    return _OptionInput.MaturityDate;
-};
+//__host__ __device__ double Option::GetMaturityDate(){
+//    return _OptionInput.MaturityDate;
+//};
 
-__host__ __device__ OptionForward::OptionForward(OptionData OptionInput):
-    Option(OptionInput){};
+__host__ __device__ OptionForward::OptionForward(OptionData OptionInput, MontecarloPath* Path):
+    Option(OptionInput, Path){};
 
 __host__ __device__ double OptionForward::GetPayOff(double* OptionPath){
     return OptionPath[_OptionInput.NumberOfDatesToSimulate-1];
 };
 
-__host__ __device__ OptionPlainVanillaCall::OptionPlainVanillaCall(OptionData OptionInput):
-    Option(OptionInput){};
-
-__host__ __device__  double OptionPlainVanillaCall::GetPayOff(double* OptionPath){
-
-    double Difference=OptionPath[_OptionInput.NumberOfDatesToSimulate-1]-_OptionInput.StrikePrice;
-    if(Difference>0) return Difference;
-    else return 0.;
+__device__ __host__ MontecarloPath* Option::GetMontecarloPath(){
+    return _Path;
 };
 
-__host__ __device__ OptionPlainVanillaPut::OptionPlainVanillaPut(OptionData OptionInput):
-    Option(OptionInput){};
+__host__ __device__ OptionPlainVanilla::OptionPlainVanilla(OptionData OptionInput, MontecarloPath* Path):
+    Option(OptionInput, Path){};
 
-__host__ __device__  double OptionPlainVanillaPut::GetPayOff(double* OptionPath){
+__host__ __device__  double OptionPlainVanilla::GetPayOff(double* OptionPath){
 
-    double Difference=_OptionInput.StrikePrice-OptionPath[_OptionInput.NumberOfDatesToSimulate-1];
+    double Difference=0;
+    if(_OptionInput.OptionTypeCallOrPut==1)
+      Difference=OptionPath[_OptionInput.NumberOfDatesToSimulate-1]-_OptionInput.StrikePrice;
+    if(_OptionInput.OptionTypeCallOrPut==2)
+      Difference=_OptionInput.StrikePrice-OptionPath[_OptionInput.NumberOfDatesToSimulate-1];
+
     if(Difference>0) return Difference;
     else return 0.;
+
 };
 
-__host__ __device__ OptionAbsolutePerformanceBarrier::OptionAbsolutePerformanceBarrier(OptionData OptionInput, double volatility):
-    Option(OptionInput){
+__host__ __device__ OptionAbsolutePerformanceBarrier::OptionAbsolutePerformanceBarrier(OptionData OptionInput, MontecarloPath* Path, double volatility):
+    Option(OptionInput, Path){
         _Volatility=volatility;
     };
 
 __host__ __device__  double OptionAbsolutePerformanceBarrier::GetPayOff(double* OptionPath){
     double SumP=0;
-    double TStep=( _OptionInput.MaturityDate - _OptionInput.TInitial ) /  _OptionInput.NumberOfDatesToSimulate;
+    double TStep= _OptionInput.MaturityDate /  _OptionInput.NumberOfDatesToSimulate;
     double Norm=1./sqrt(TStep);
     for(int i=0; i<_OptionInput.NumberOfDatesToSimulate-1; i++){
         if( abs( Norm*log(OptionPath[i+1]/OptionPath[i]) ) > _OptionInput.B * _Volatility )

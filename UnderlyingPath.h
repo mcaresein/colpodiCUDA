@@ -6,9 +6,8 @@
 #ifndef _UnderlyingPath_h_
 #define _UnderlyingPath_h_
 
-#include "RandomGenerator.h"
 #include "StocasticProcess.h"
-#include "Option.h"
+//#include "Option.h"
 
 class UnderlyingPath{
 public:
@@ -17,18 +16,17 @@ public:
 
 class MontecarloPath: public UnderlyingPath{
 public:
-  __host__ __device__  MontecarloPath(double, double, double, int ,RandomGenerator*, StocasticProcess*);
+  __host__ __device__  MontecarloPath(MarketData, double, int, StocasticProcess*, int EulerSubStep);
   __host__ __device__  ~MontecarloPath();
   __host__ __device__  double* GetPath();
 
 private:
     double* _UnderlyingPath;
-    RandomGenerator* _Generator;
     StocasticProcess* _Process;
-    double _EquityInitialPrice;
+    MarketData _MarketInput;
     double _MaturityDate;
-    double _TInitial;
     int _NumberOfDatesToSimulate;
+    int _EulerSubStep;
 };
 
 #endif

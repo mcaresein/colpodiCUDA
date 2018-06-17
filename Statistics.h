@@ -10,27 +10,23 @@
 #include <iostream>
 #include <string>
 
-class DevStatistics{
+class Statistics{
 public:
-	__host__ __device__ DevStatistics();
+	__host__ __device__ Statistics();
 	__host__ __device__ void AddValue(double payoff);
 	__host__ __device__ double GetPayOffs();
-	__host__ __device__ double GetPayOffs2();
+  __host__ __device__ double GetPayOffs2();
+	__host__ __device__ int GetCont();
+	__host__ __device__ void Reset();
+	__host__ double GetPrice(Statistics* PayOffs, int DimThreads);
+	__host__ double GetMCError(Statistics* PayOffs, int DimThreads);
+	__host__ void Print(Statistics* PayOffs, int DimThreads);
+	__host__ void Print(std::string, Statistics* PayOffs, int DimThreads);
+
 private:
 	double _PayOffs;
 	double _PayOffs2;
-};
-
-class HostStatistics {
-public:
-	__host__ HostStatistics(DevStatistics*, int, int);
-	__host__ double GetPrice();
-	__host__ double GetMCError();
-	__host__ void Print();
-	__host__ void Print(std::string);
-private:
-	double _Price;
-	double _MCError;
+	int _Cont;
 };
 
 #endif

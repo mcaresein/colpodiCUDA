@@ -1,18 +1,16 @@
 #include <iostream>
 #include <cmath>
 #include "UnderlyingPath.h"
-#include "RandomGenerator.h"
 #include "StocasticProcess.h"
 #include "Option.h"
 
-__host__ __device__  MontecarloPath::MontecarloPath(double EquityInitialPrice, double MaturityDate, double TInitial, int NumberOfDatesToSimulate ,RandomGenerator* Generator,StocasticProcess* Process){
-    _EquityInitialPrice = EquityInitialPrice;
-    _Generator = Generator;
+__host__ __device__  MontecarloPath::MontecarloPath(MarketData MarketInput, double MaturityDate, int NumberOfDatesToSimulate ,StocasticProcess* Process, int EulerSubStep){
+    _MarketInput=MarketInput;
     _Process = Process;
     _MaturityDate=MaturityDate;
-    _TInitial=TInitial;
     _NumberOfDatesToSimulate=NumberOfDatesToSimulate;
     _UnderlyingPath = new double[NumberOfDatesToSimulate];
+    _EulerSubStep = EulerSubStep;
 };
 
 __host__ __device__  MontecarloPath::~MontecarloPath(){
@@ -21,12 +19,13 @@ __host__ __device__  MontecarloPath::~MontecarloPath(){
 
 __host__ __device__  double* MontecarloPath::GetPath(){
 
-    double TStep = ( _MaturityDate - _TInitial ) /  _NumberOfDatesToSimulate ;
-    double temp=_EquityInitialPrice;
+    double TStep =  _MaturityDate /  (_NumberOfDatesToSimulate*_EulerSubStep) ;
+    double temp = _MarketInput.EquityInitialPrice;
 
     for(int i=0; i<_NumberOfDatesToSimulate; i++){
-        double w = _Generator->GetGaussianRandomNumber();
-        temp = _Process->Step(temp, TStep, w);
+        for(int j=0; j<_EulerSubStep; j++){
+            temp = _Process->Step(_MarketInput, TStep, temp);
+        }
         _UnderlyingPath[i]=temp;
     }
 

@@ -6,7 +6,7 @@
 #ifndef _RandomGenerator_h_
 #define _RandomGenerator_h_
 
-#include "DataTypes.h"
+#include "Seed.h"
 
 class RandomGenerator{
 public:
@@ -14,17 +14,7 @@ public:
     __host__ __device__  virtual double GetGaussianRandomNumber();
 protected:
     double _SavedRandomNumber;
-    bool _Status, _GPU;
-};
-
-class CombinedGenerator: public RandomGenerator{
-public:
-    __host__ __device__  CombinedGenerator(Seed, bool);
-    __host__ __device__  unsigned int LCGStep(unsigned int &, unsigned int , unsigned long );
-    __host__ __device__  unsigned int TausStep(unsigned int &, unsigned int , unsigned int , unsigned int , unsigned long );
-    __host__ __device__  double GetUniformRandomNumber();
-private:
-    unsigned int _Sa, _Sb, _Sc, _Sd;
+    bool _Status, _ReExtractionBoxMuller;
 };
 
 #endif

@@ -1,9 +1,9 @@
 /*##############################################################################################################################################################
 # Pricer MonteCarlo di opzioni la cui dinamica e' determinata da processi lognormali esatti o approssimati.                                                    #
 #                                                                                                                                                              #
-# Usage: ./Pricer                                                                                                                                              #
-# Speficicare: Dati di input del processo (MarketData), Dati di input dell'opzione (OptionData), tipo di Pay Off (guarda in PayOff.h per quelli implementati), #
-#             tipo di processo (guarda in StocasticProcess.h per quelli implementati).                                                                         #
+# Usage: ./pricer                                                                                                                                              #
+# Speficicare: Dati di input del processo (MarketData), Dati di input dell'opzione (OptionData), tipo di opzione (guarda in Option.h per quelle implementate), #
+#             tipo di processo (guarda in StocasticProcess.h per quelli implementati). Vedi file input.conf in DATA                                            #
 #                                                                                                                                                              #
 # Output: Prezzo stimato secondo il Pay Off specificato e corrispondente errore MonteCarlo.                                                                    #
 ##############################################################################################################################################################*/
@@ -13,93 +13,78 @@
 #include <ctime>
 #include "MonteCarloPricer.h"
 #include "Statistics.h"
-#include "DataTypes.h"
+#include "Seed.h"
+#include "MarketData.h"
+#include "OptionData.h"
+#include "GPUData.h"
+#include "SimulationParameters.h"
 #include "KernelFunctions.cu"
 #include "Utilities.cu"
 
 using namespace std;
 
 int main(){
-
 //## Inizializzazione parametri di mercato e opzione. ##########################
-
-    int THREADS;
-    int STREAMS;
 
     MarketData MarketInput;
     OptionData OptionInput;
     SimulationParameters Parameters;
+    GPUData GPUInput;
 
-    Reader(MarketInput, OptionInput, THREADS, STREAMS, Parameters);
+    Reader(MarketInput, OptionInput, GPUInput, Parameters);
 
 //## Allocazione di memoria. ###################################################
 
-    DevStatistics* PayOffsGPU;
-    DevStatistics* PayOffsCPU;
+    Statistics* PayOffs;
     Seed *SeedVector;
 
-    DevStatistics* _PayOffsGPU;
+    Statistics* _PayOffs;
     Seed *_SeedVector;
 
-    size_t sizeSeedVector = THREADS * sizeof(Seed);
-    size_t sizeDevStVector = THREADS * sizeof(DevStatistics);
+    size_t sizeSeedVector = GPUInput.Threads * sizeof(Seed);
+    size_t sizeDevStVector = GPUInput.Threads * sizeof(Statistics);
 
-    MemoryAllocation(& PayOffsGPU, & PayOffsCPU,  & SeedVector, & _PayOffsGPU, & _SeedVector, sizeSeedVector, sizeDevStVector, THREADS);
+    MemoryAllocationGPU(& PayOffs,  & SeedVector, & _PayOffs, & _SeedVector, sizeSeedVector, sizeDevStVector, GPUInput.Threads);
 
 //## Costruzione vettore dei seed. #############################################
 
-    GetSeeds(SeedVector, THREADS);
+    GetSeeds(SeedVector, GPUInput.Threads);
 
     cudaMemcpy(_SeedVector, SeedVector, sizeSeedVector, cudaMemcpyHostToDevice);
 
 //## Calcolo dei PayOff su GPU. ################################################
 
-    int blockSize=256;
-    int gridSize = (THREADS + blockSize - 1) / blockSize;
+    cout<<"Simulazione..."<<endl;
+
+    int gridSize = (GPUInput.Threads + GPUInput.BlockSize - 1) / GPUInput.BlockSize;
 
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
 
     cudaEventRecord(start);
-    Kernel<<<gridSize, blockSize>>>(_SeedVector, _PayOffsGPU, STREAMS, MarketInput, OptionInput, Parameters);
+    Kernel<<<gridSize, GPUInput.BlockSize>>>(_SeedVector, _PayOffs, GPUInput.Streams, MarketInput, OptionInput, Parameters);
     cudaEventRecord(stop);
 
-    cudaMemcpy(PayOffsGPU, _PayOffsGPU, sizeDevStVector, cudaMemcpyDeviceToHost);
+    cudaMemcpy(PayOffs, _PayOffs, sizeDevStVector, cudaMemcpyDeviceToHost);
 
     cudaEventSynchronize(stop);
     float milliseconds = 0;
     cudaEventElapsedTime(&milliseconds, start, stop);
 
-//## Calcolo dei PayOff su CPU. ################################################
+//## Calcolo e stampa su file dei valori. ######################################
 
-    clock_t startcpu;
-    double duration;
+    Statistics FinalStatistics;
 
-    startcpu = clock();
-    KernelSimulator(SeedVector, PayOffsCPU, STREAMS, MarketInput, OptionInput, Parameters, THREADS);
-    duration = (clock() - startcpu ) / (double) CLOCKS_PER_SEC;
-
-//## Calcolo PayOff ed errore monte carlo a partire dai valori di PayOff simulati. ##
-
-    HostStatistics OptionGPU(PayOffsGPU, THREADS, STREAMS);
-    HostStatistics OptionCPU(PayOffsCPU, THREADS, STREAMS);
-
-//## Stampa su file dei valori. ##############################################
-
-    cout<<"Valori GPU"<<endl;
-    OptionGPU.Print();
-    OptionGPU.Print("DATA/outputGPU.dat");
+    cout<<endl<<"Valori ottenuti: "<<endl;
+    FinalStatistics.Print(PayOffs, GPUInput.Threads);
     cout<<"Tempo di calcolo: "<<milliseconds<<" ms"<<endl<<endl;
+    FinalStatistics.Print("DATA/output.dat", PayOffs, GPUInput.Threads);
 
-    cout<<"Valori CPU"<<endl;
-    OptionCPU.Print();
-    OptionCPU.Print("DATA/outputCPU.dat");
-    cout<<"Tempo di calcolo: "<<duration*1000<<" ms"<<endl;
 
 //## Liberazione memoria. ######################################################
 
-    MemoryDeallocation(PayOffsGPU, PayOffsCPU, SeedVector, _PayOffsGPU, _SeedVector);
+    MemoryDeallocationGPU(PayOffs, SeedVector, _PayOffs, _SeedVector);
 
     return 0;
 }

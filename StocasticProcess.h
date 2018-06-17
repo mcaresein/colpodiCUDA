@@ -5,27 +5,29 @@
 
 #ifndef _StocasticProcess_h_
 #define _StocasticProcess_h_
+#include "RandomGenerator.h"
+#include "MarketData.h"
 
 class StocasticProcess{
 public:
-    __host__ __device__  virtual double Step(double InitialPrice, double TimeStep, double RandomNumber)=0;
+    __host__ __device__  virtual double Step(MarketData , double TimeStep, double PriceStep)=0;
 
 };
 
 class ExactLogNormalProcess: public StocasticProcess{
 public:
-  __host__ __device__  ExactLogNormalProcess(double Volatility, double Drift);
-  __host__ __device__  double Step(double InitialPrice, double TimeStep, double RandomNumber);
+  __host__ __device__  ExactLogNormalProcess(RandomGenerator* Generator);
+  __host__ __device__  double Step(MarketData , double TimeStep, double PriceStep);
 private:
-  double _Volatility, _Drift;
+  RandomGenerator* _Generator;
 };
 
 class EulerLogNormalProcess: public StocasticProcess{
 public:
-  __host__ __device__  EulerLogNormalProcess(double Volatility, double Drift);
-  __host__ __device__  double Step(double InitialPrice, double TimeStep, double RandomNumber);
+  __host__ __device__  EulerLogNormalProcess(RandomGenerator* Generator);
+  __host__ __device__  double Step(MarketData , double TimeStep, double PriceStep);
 private:
-  double _Volatility, _Drift;
+  RandomGenerator* _Generator;
 };
 
 #endif

@@ -5,41 +5,43 @@
 #include "MonteCarloPricer.h"
 #include "Statistics.h"
 #include "RandomGenerator.h"
-#include "DataTypes.h"
+#include "RandomGeneratorCombined.h"
+#include "Seed.h"
+#include "MarketData.h"
+#include "OptionData.h"
+#include "SimulationParameters.h"
 #include "Option.h"
 
 /*############################ Kernel Functions ############################*/
 
-__host__ __device__ void TrueKernel(Seed* SeedVector, DevStatistics* PayOffs, int streams, MarketData MarketInput, OptionData OptionInput, SimulationParameters Parameters, int cont){
+__host__ __device__ void TrueKernel(Seed* SeedVector, Statistics* PayOffs, int streams, MarketData MarketInput, OptionData OptionInput, SimulationParameters Parameters, int cont){
 
-    RandomGenerator* Generator= new CombinedGenerator(SeedVector[cont], true);
-
-    Option* Option;
-    if(Parameters.OptionType==0)
-        Option=new OptionForward(OptionInput);
-    if(Parameters.OptionType==1)
-        Option=new OptionPlainVanillaCall(OptionInput);
-    if(Parameters.OptionType==2)
-        Option=new OptionPlainVanillaPut(OptionInput);
-    if(Parameters.OptionType==3)
-        Option=new OptionAbsolutePerformanceBarrier(OptionInput, MarketInput.Volatility);
+    RandomGenerator* Generator= new RandomGeneratorCombined(SeedVector[cont], false);
 
     StocasticProcess* Process;
     if(Parameters.EulerApprox==false)
-        Process=new ExactLogNormalProcess(MarketInput.Volatility, MarketInput.Drift);
+        Process=new ExactLogNormalProcess(Generator);
     if(Parameters.EulerApprox==true)
-        Process=new EulerLogNormalProcess(MarketInput.Volatility, MarketInput.Drift);
+        Process=new EulerLogNormalProcess(Generator);
 
-    MonteCarloPricer Pricer(MarketInput, Option, Generator, Process, streams);
+    MontecarloPath* Path=new MontecarloPath(MarketInput, OptionInput.MaturityDate, OptionInput.NumberOfDatesToSimulate, Process, OptionInput.EulerSubStep);
 
-//    DevStatistics* temp=new DevStatistics;  non va
-    DevStatistics temp;
-    Pricer.ComputePrice(&temp);
-//  Pricer.ComputePrice(&PayOffs[cont]);  perchè non va???
-    PayOffs[cont]=temp;
+    Option* Option;
+    if(Parameters.OptionType==0)
+        Option=new OptionForward(OptionInput, Path);
+    if(Parameters.OptionType==1 || Parameters.OptionType==2)
+        Option=new OptionPlainVanilla(OptionInput, Path);
+    if(Parameters.OptionType==3)
+        Option=new OptionAbsolutePerformanceBarrier(OptionInput, Path, MarketInput.Volatility);
+
+    MonteCarloPricer Pricer(Option, Process, streams);
+
+    PayOffs[cont].Reset();
+    Pricer.ComputePrice(&PayOffs[cont]);
+
 }
 
-__global__ void Kernel(Seed* SeedVector, DevStatistics* PayOffs, int streams, MarketData MarketInput, OptionData OptionInput, SimulationParameters Parameters){
+__global__ void Kernel(Seed* SeedVector, Statistics* PayOffs, int streams, MarketData MarketInput, OptionData OptionInput, SimulationParameters Parameters){
 
     int i = blockDim.x * blockIdx.x + threadIdx.x;
 
@@ -48,7 +50,7 @@ __global__ void Kernel(Seed* SeedVector, DevStatistics* PayOffs, int streams, Ma
 
 //## Funzione che gira su CPU che restituisce due vettori con sommme dei PayOff e dei PayOff quadrati. ##
 
-__host__ void KernelSimulator(Seed* SeedVector, DevStatistics* PayOffs, int streams, MarketData MarketInput, OptionData OptionInput, SimulationParameters Parameters, int threads){
+__host__ void KernelSimulator(Seed* SeedVector, Statistics* PayOffs, int streams, MarketData MarketInput, OptionData OptionInput, SimulationParameters Parameters, int threads){
 
     for(int i=0; i<threads; i++) TrueKernel(SeedVector, PayOffs, streams, MarketInput, OptionInput, Parameters, i);
 
