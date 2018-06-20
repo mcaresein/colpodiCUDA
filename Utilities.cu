@@ -168,6 +168,7 @@ void MemoryDeallocationGPUandCPU(Statistics* PayOffsGPU, Statistics* PayOffsCPU,
 
     cudaFree(_PayOffsGPU);
     cudaFree(_SeedVector);
+    cudaDeviceReset();
 };
 
 void MemoryDeallocationGPU(Statistics* PayOffsGPU, Seed* SeedVector, Statistics* _PayOffsGPU, Seed* _SeedVector){
@@ -176,4 +177,5 @@ void MemoryDeallocationGPU(Statistics* PayOffsGPU, Seed* SeedVector, Statistics*
 
     cudaFree(_PayOffsGPU);
     cudaFree(_SeedVector);
+    cudaDeviceReset();
 };
