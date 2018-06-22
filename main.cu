@@ -86,5 +86,7 @@ int main(){
 
     MemoryDeallocationGPU(PayOffs, SeedVector, _PayOffs, _SeedVector);
 
+    cudaDeviceReset();
+
     return 0;
 }

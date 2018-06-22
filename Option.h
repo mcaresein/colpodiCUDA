@@ -39,10 +39,11 @@ public:
 
 class OptionAbsolutePerformanceBarrier: public Option{
 public:
-    __device__ __host__ OptionAbsolutePerformanceBarrier(OptionData, MontecarloPath*, double Volatility);
+    __device__ __host__ OptionAbsolutePerformanceBarrier(OptionData, MontecarloPath*, double Volatility, double InitialPrice);
     __device__ __host__  double GetPayOff(double*);
 private:
     double _Volatility;
+    double _InitialPrice;
 };
 
 #endif

@@ -11,10 +11,10 @@ using namespace std;
 
 void Reader(MarketData &MarketInput, OptionData &OptionInput, GPUData &GPUInput, SimulationParameters &Parameters){
 
-    char* InputFile="DATA/input.conf";
+    string InputFile="DATA/input.conf";
     cout<<"Lettura file di input: "<<InputFile<<" ..."<<endl;
     fstream file;
-    file.open(InputFile , ios::in);
+    file.open(InputFile.c_str() , ios::in);
 
     if(file.fail()){
         cout<< "ERRORE: file di configurazione non trovato. "<<  endl;
@@ -168,6 +168,7 @@ void MemoryDeallocationGPUandCPU(Statistics* PayOffsGPU, Statistics* PayOffsCPU,
 
     cudaFree(_PayOffsGPU);
     cudaFree(_SeedVector);
+
     cudaDeviceReset();
 };
 
@@ -177,5 +178,6 @@ void MemoryDeallocationGPU(Statistics* PayOffsGPU, Seed* SeedVector, Statistics*
 
     cudaFree(_PayOffsGPU);
     cudaFree(_SeedVector);
+
     cudaDeviceReset();
 };

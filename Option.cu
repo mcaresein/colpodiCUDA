@@ -45,15 +45,20 @@ __host__ __device__  double OptionPlainVanilla::GetPayOff(double* OptionPath){
 
 };
 
-__host__ __device__ OptionAbsolutePerformanceBarrier::OptionAbsolutePerformanceBarrier(OptionData OptionInput, MontecarloPath* Path, double volatility):
+__host__ __device__ OptionAbsolutePerformanceBarrier::OptionAbsolutePerformanceBarrier(OptionData OptionInput, MontecarloPath* Path, double volatility, double InitialPrice):
     Option(OptionInput, Path){
         _Volatility=volatility;
+        _InitialPrice=InitialPrice;
     };
 
 __host__ __device__  double OptionAbsolutePerformanceBarrier::GetPayOff(double* OptionPath){
     double SumP=0;
     double TStep= _OptionInput.MaturityDate /  _OptionInput.NumberOfDatesToSimulate;
     double Norm=1./sqrt(TStep);
+
+    if( abs( Norm*log(OptionPath[0]/_InitialPrice) ) > _OptionInput.B * _Volatility )
+        SumP=SumP+1.;
+
     for(int i=0; i<_OptionInput.NumberOfDatesToSimulate-1; i++){
         if( abs( Norm*log(OptionPath[i+1]/OptionPath[i]) ) > _OptionInput.B * _Volatility )
             SumP=SumP+1.;

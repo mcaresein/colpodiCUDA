@@ -32,7 +32,7 @@ __host__ __device__ void TrueKernel(Seed* SeedVector, Statistics* PayOffs, int s
     if(Parameters.OptionType==1 || Parameters.OptionType==2)
         Option=new OptionPlainVanilla(OptionInput, Path);
     if(Parameters.OptionType==3)
-        Option=new OptionAbsolutePerformanceBarrier(OptionInput, Path, MarketInput.Volatility);
+        Option=new OptionAbsolutePerformanceBarrier(OptionInput, Path, MarketInput.Volatility, MarketInput.EquityInitialPrice);
 
     MonteCarloPricer Pricer(Option, Process, streams);
 
