@@ -2,8 +2,8 @@
 #define _SimulationParameters_h_
 
 struct SimulationParameters{
-    int OptionType;
     bool EulerApprox;
+    int EulerSubStep;
 };
 
 #endif

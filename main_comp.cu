@@ -28,7 +28,7 @@ int main(){
 //## Inizializzazione parametri di mercato e opzione. ##########################
 
     MarketData MarketInput;
-    OptionData OptionInput;
+    OptionDataContainer OptionInput;
     SimulationParameters Parameters;
     GPUData GPUInput;
 
@@ -86,26 +86,37 @@ int main(){
     KernelSimulator(SeedVector, PayOffsCPU, GPUInput.Streams, MarketInput, OptionInput, Parameters, GPUInput.Threads);
     duration = (clock() - startcpu ) / (double) CLOCKS_PER_SEC;
 
-    Statistics FinalStatistics;
+    Statistics FinalStatisticsGPU;
+
+    for (int i=0; i<GPUInput.Threads; i++){
+      FinalStatisticsGPU=FinalStatisticsGPU+PayOffsGPU[i];
+    };
+
+    Statistics FinalStatisticsCPU;
+
+
+    for (int i=0; i<GPUInput.Threads; i++){
+      FinalStatisticsCPU=FinalStatisticsCPU+PayOffsCPU[i];
+    };
 
 //## Calcolo e stampa su file dei valori. ######################################
 
     cout<<endl<<"Valori GPU:"<<endl;
-    FinalStatistics.Print(PayOffsGPU, GPUInput.Threads);
+    FinalStatisticsGPU.Print(OptionInput.MaturityDate, MarketInput.Drift);
     cout<<"Tempo di calcolo: "<<milliseconds<<" ms"<<endl<<endl;
     cout<<"Valori CPU:"<<endl;
-    FinalStatistics.Print(PayOffsCPU, GPUInput.Threads);
+    FinalStatisticsCPU.Print(OptionInput.MaturityDate, MarketInput.Drift);
     cout<<"Tempo di calcolo: "<<duration*1000<<" ms"<<endl<<endl;
 
-    FinalStatistics.Print("DATA/outputGPU.dat", PayOffsGPU, GPUInput.Threads);
-    FinalStatistics.Print("DATA/outputCPU.dat", PayOffsCPU, GPUInput.Threads);
+    FinalStatisticsGPU.Print(OptionInput.MaturityDate, MarketInput.Drift,"DATA/outputGPU.dat");
+    FinalStatisticsCPU.Print(OptionInput.MaturityDate, MarketInput.Drift,"DATA/outputCPU.dat");
 
 //## Controllo #################################################################
 
-    double GPUPrice=FinalStatistics.GetPrice(PayOffsGPU, GPUInput.Threads);
-    double CPUPrice=FinalStatistics.GetPrice(PayOffsCPU, GPUInput.Threads);
-    double GPUError=FinalStatistics.GetMCError(PayOffsGPU, GPUInput.Threads);
-    double CPUError=FinalStatistics.GetMCError(PayOffsCPU, GPUInput.Threads);
+    double GPUPrice=FinalStatisticsGPU.GetMean();
+    double CPUPrice=FinalStatisticsCPU.GetMean();
+    double GPUError=FinalStatisticsGPU.GetStDev();
+    double CPUError=FinalStatisticsCPU.GetStDev();
 
     if(GPUPrice==CPUPrice)
         cout<<"I prezzi coincidono!"<<endl;

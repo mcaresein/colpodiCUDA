@@ -4,12 +4,12 @@
 #include "StocasticProcess.h"
 #include "Option.h"
 
-__host__ __device__  MontecarloPath::MontecarloPath(MarketData MarketInput, double MaturityDate, int NumberOfDatesToSimulate ,StocasticProcess* Process, int EulerSubStep){
+__host__ __device__  MontecarloPath::MontecarloPath(MarketData MarketInput, double MaturityDate, int NumberOfFixingDate ,StocasticProcess* Process, int EulerSubStep){
     _MarketInput=MarketInput;
     _Process = Process;
     _MaturityDate=MaturityDate;
-    _NumberOfDatesToSimulate=NumberOfDatesToSimulate;
-    _UnderlyingPath = new double[NumberOfDatesToSimulate];
+    _NumberOfFixingDate=NumberOfFixingDate;
+    _UnderlyingPath = new double[NumberOfFixingDate];
     _EulerSubStep = EulerSubStep;
 };
 
@@ -19,10 +19,10 @@ __host__ __device__  MontecarloPath::~MontecarloPath(){
 
 __host__ __device__  double* MontecarloPath::GetPath(){
 
-    double TStep =  _MaturityDate /  (_NumberOfDatesToSimulate*_EulerSubStep) ;
+    double TStep =  _MaturityDate /  (_NumberOfFixingDate*_EulerSubStep) ;
     double temp = _MarketInput.EquityInitialPrice;
 
-    for(int i=0; i<_NumberOfDatesToSimulate; i++){
+    for(int i=0; i<_NumberOfFixingDate; i++){
         for(int j=0; j<_EulerSubStep; j++){
             temp = _Process->Step(_MarketInput, TStep, temp);
         }
@@ -31,4 +31,7 @@ __host__ __device__  double* MontecarloPath::GetPath(){
 
     return _UnderlyingPath;
 
+};
+__host__ __device__  MarketData MontecarloPath::GetMarketData(){
+    return _MarketInput;
 };

@@ -8,7 +8,9 @@ __host__ __device__  ExactLogNormalProcess::ExactLogNormalProcess(RandomGenerato
 };
 
 __host__ __device__  double ExactLogNormalProcess::Step(MarketData MarketInput, double TimeStep, double PriceStep){
-  return PriceStep*exp((MarketInput.Drift - (MarketInput.Volatility*MarketInput.Volatility)/2)*TimeStep + MarketInput.Volatility*sqrt(TimeStep)*_Generator->GetGaussianRandomNumber());
+    //double w=_Generator->GetGaussianRandomNumber();
+
+    return PriceStep*exp((MarketInput.Drift - (MarketInput.Volatility*MarketInput.Volatility)/2)*TimeStep + MarketInput.Volatility*sqrt(TimeStep)*_Generator->GetGaussianRandomNumber());
 };
 
 __host__ __device__  EulerLogNormalProcess::EulerLogNormalProcess(RandomGenerator* Generator){

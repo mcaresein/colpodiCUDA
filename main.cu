@@ -27,7 +27,7 @@ int main(){
 //## Inizializzazione parametri di mercato e opzione. ##########################
 
     MarketData MarketInput;
-    OptionData OptionInput;
+    OptionDataContainer OptionInput;
     SimulationParameters Parameters;
     GPUData GPUInput;
 
@@ -75,11 +75,13 @@ int main(){
 //## Calcolo e stampa su file dei valori. ######################################
 
     Statistics FinalStatistics;
-
+    for (int i=0; i<GPUInput.Threads; i++){
+      FinalStatistics=FinalStatistics+PayOffs[i];
+    };
     cout<<endl<<"Valori ottenuti: "<<endl;
-    FinalStatistics.Print(PayOffs, GPUInput.Threads);
+    FinalStatistics.Print(OptionInput.MaturityDate, MarketInput.Drift);
     cout<<"Tempo di calcolo: "<<milliseconds<<" ms"<<endl<<endl;
-    FinalStatistics.Print("DATA/output.dat", PayOffs, GPUInput.Threads);
+    FinalStatistics.Print(OptionInput.MaturityDate, MarketInput.Drift,"DATA/output.dat");
 
 
 //## Liberazione memoria. ######################################################

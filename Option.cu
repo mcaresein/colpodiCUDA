@@ -1,70 +1,64 @@
 #include <cmath>
+#include <iostream>
 #include "Option.h"
 
-__host__ __device__ Option::Option(OptionData OptionInput, MontecarloPath* Path){
-    _OptionInput = OptionInput;
+__host__ __device__ Option::Option(OptionData OptionParameters, MontecarloPath* Path){
+    _OptionParameters = OptionParameters;
     _Path = Path;
 };
 
-__host__ __device__ int Option::GetNumberOfDatesToSimulate(){
-    return _OptionInput.NumberOfDatesToSimulate;
+__host__ __device__ int Option::GetNumberOfFixingDate(){
+    return _OptionParameters.NumberOfFixingDate;
 };
 
-//__host__ __device__ int Option::GetEulerSubStep(){
-//    return _OptionInput.EulerSubStep;
-//};
+__host__ __device__ OptionForward::OptionForward(OptionData OptionParameters, MontecarloPath* Path):
+    Option(OptionParameters, Path){};
 
-//__host__ __device__ double Option::GetMaturityDate(){
-//    return _OptionInput.MaturityDate;
-//};
-
-__host__ __device__ OptionForward::OptionForward(OptionData OptionInput, MontecarloPath* Path):
-    Option(OptionInput, Path){};
-
-__host__ __device__ double OptionForward::GetPayOff(double* OptionPath){
-    return OptionPath[_OptionInput.NumberOfDatesToSimulate-1];
+__host__ __device__ double OptionForward::GetPayOff(double* OptionPath, int NumberOfFixingDate){
+    return OptionPath[NumberOfFixingDate-1];
 };
 
 __device__ __host__ MontecarloPath* Option::GetMontecarloPath(){
     return _Path;
 };
 
-__host__ __device__ OptionPlainVanilla::OptionPlainVanilla(OptionData OptionInput, MontecarloPath* Path):
-    Option(OptionInput, Path){};
+__host__ __device__ OptionPlainVanilla::OptionPlainVanilla(OptionData OptionParameters, MontecarloPath* Path):
+    Option(OptionParameters, Path){};
 
-__host__ __device__  double OptionPlainVanilla::GetPayOff(double* OptionPath){
+__host__ __device__  double OptionPlainVanilla::GetPayOff(double* OptionPath, int NumberOfFixingDate){
 
     double Difference=0;
-    if(_OptionInput.OptionTypeCallOrPut==1)
-      Difference=OptionPath[_OptionInput.NumberOfDatesToSimulate-1]-_OptionInput.StrikePrice;
-    if(_OptionInput.OptionTypeCallOrPut==2)
-      Difference=_OptionInput.StrikePrice-OptionPath[_OptionInput.NumberOfDatesToSimulate-1];
+    if( _OptionParameters.OptionType==1)
+      Difference=OptionPath[NumberOfFixingDate-1]-_OptionParameters.AdditionalParameters[0];
+    if( _OptionParameters.OptionType==2)
+      Difference=_OptionParameters.AdditionalParameters[0]-OptionPath[NumberOfFixingDate-1];
 
     if(Difference>0) return Difference;
     else return 0.;
 
 };
 
-__host__ __device__ OptionAbsolutePerformanceBarrier::OptionAbsolutePerformanceBarrier(OptionData OptionInput, MontecarloPath* Path, double volatility, double InitialPrice):
-    Option(OptionInput, Path){
-        _Volatility=volatility;
-        _InitialPrice=InitialPrice;
+__host__ __device__ OptionAbsolutePerformanceBarrier::OptionAbsolutePerformanceBarrier(OptionData OptionParameters, MontecarloPath* Path):
+    Option(OptionParameters, Path){
+        _Volatility=(Path->GetMarketData()).Volatility;
+        _InitialPrice=Path->GetMarketData().EquityInitialPrice;
     };
 
-__host__ __device__  double OptionAbsolutePerformanceBarrier::GetPayOff(double* OptionPath){
+__host__ __device__  double OptionAbsolutePerformanceBarrier::GetPayOff(double* OptionPath, int NumberOfFixingDate){
     double SumP=0;
-    double TStep= _OptionInput.MaturityDate /  _OptionInput.NumberOfDatesToSimulate;
+    double TStep= _OptionParameters.MaturityDate / NumberOfFixingDate;
     double Norm=1./sqrt(TStep);
 
-    if( abs( Norm*log(OptionPath[0]/_InitialPrice) ) > _OptionInput.B * _Volatility )
+    if( abs( Norm*log(OptionPath[0]/_InitialPrice) ) > _OptionParameters.AdditionalParameters[0] * _Volatility )
         SumP=SumP+1.;
 
-    for(int i=0; i<_OptionInput.NumberOfDatesToSimulate-1; i++){
-        if( abs( Norm*log(OptionPath[i+1]/OptionPath[i]) ) > _OptionInput.B * _Volatility )
+    for(int i=0; i<NumberOfFixingDate-1; i++){
+        if( abs( Norm*log(OptionPath[i+1]/OptionPath[i]) ) > _OptionParameters.AdditionalParameters[0] * _Volatility )
             SumP=SumP+1.;
     }
-    if( SumP/_OptionInput.NumberOfDatesToSimulate-_OptionInput.K > 0 )
-        return _OptionInput.N*(SumP/_OptionInput.NumberOfDatesToSimulate-_OptionInput.K);
+
+    if( SumP/NumberOfFixingDate-_OptionParameters.AdditionalParameters[1] > 0 )
+        return _OptionParameters.AdditionalParameters[2]*(SumP/NumberOfFixingDate-_OptionParameters.AdditionalParameters[1]);
     else
         return 0;
 };
