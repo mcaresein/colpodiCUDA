@@ -15,4 +15,4 @@ PER USARE IL PROGRAMMA:
 Il makefile crea due oggetti eseguibili: "pricer" e "pricer_comp", il primo sfrutta unicamente la GPU, il secondo esegue il confronto tra i risultati ottenuti su CPU e GPU.
 Il file contenente i dati di input viene specificato nella funziore "Reader" nel file Utilities.cu (di default è impostato il file "input.conf" nella cartella "DATA"). 
 
-Ultimo aggiornamento: 17 giu 2018
+Ultimo aggiornamento: sa dio
