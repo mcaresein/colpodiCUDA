@@ -1,5 +1,5 @@
-#ifndef _MainFunctions_cu_
-#define _MainFunctions_cu_
+#ifndef _KernelFunctions_cu_
+#define _KernelFunctions_cu_
 
 #include <iostream>
 #include "MonteCarloPricer.h"
@@ -14,7 +14,7 @@
 
 /*############################ Kernel Functions ############################*/
 
-__host__ __device__ void TrueKernel(Seed* SeedVector, Statistics* PayOffs, int streams, MarketData MarketInput, OptionData OptionInput, SimulationParameters Parameters, int cont){
+__host__ __device__ void TrueKernel(Seed* SeedVector, Statistics* PayOffs, int streams, MarketData MarketInput, OptionDataContainer OptionInput, SimulationParameters Parameters, int cont){
 
     RandomGenerator* Generator= new RandomGeneratorCombined(SeedVector[cont], false);
 
@@ -24,15 +24,32 @@ __host__ __device__ void TrueKernel(Seed* SeedVector, Statistics* PayOffs, int s
     if(Parameters.EulerApprox==true)
         Process=new EulerLogNormalProcess(Generator);
 
-    MontecarloPath* Path=new MontecarloPath(MarketInput, OptionInput.MaturityDate, OptionInput.NumberOfDatesToSimulate, Process, OptionInput.EulerSubStep);
+    MontecarloPath* Path=new MontecarloPath(MarketInput, OptionInput.MaturityDate, OptionInput.NumberOfFixingDate, Process, Parameters.EulerSubStep);
+
+    OptionData OptionParameters;
+    OptionParameters.MaturityDate=OptionInput.MaturityDate;
+    OptionParameters.NumberOfFixingDate=OptionInput.NumberOfFixingDate;
+    OptionParameters.OptionType=OptionInput.OptionType;
 
     Option* Option;
-    if(Parameters.OptionType==0)
-        Option=new OptionForward(OptionInput, Path);
-    if(Parameters.OptionType==1 || Parameters.OptionType==2)
-        Option=new OptionPlainVanilla(OptionInput, Path);
-    if(Parameters.OptionType==3)
-        Option=new OptionAbsolutePerformanceBarrier(OptionInput, Path, MarketInput.Volatility, MarketInput.EquityInitialPrice);
+    if( OptionInput.OptionType==0){
+        Option=new OptionForward(OptionParameters, Path);
+    }
+    if( OptionInput.OptionType==1 || OptionInput.OptionType==2){
+        OptionParameters.AdditionalParameters=new double[1];
+        OptionParameters.AdditionalParameters[0]=OptionInput.StrikePrice;
+
+        Option=new OptionPlainVanilla(OptionParameters, Path);
+    }
+
+    if( OptionInput.OptionType==3){
+        OptionParameters.AdditionalParameters=new double[3];
+        OptionParameters.AdditionalParameters[0]=OptionInput.B;
+        OptionParameters.AdditionalParameters[1]=OptionInput.K;
+        OptionParameters.AdditionalParameters[2]=OptionInput.N;
+
+        Option=new OptionAbsolutePerformanceBarrier(OptionParameters, Path);
+    }
 
     MonteCarloPricer Pricer(Option, Process, streams);
 
@@ -41,7 +58,7 @@ __host__ __device__ void TrueKernel(Seed* SeedVector, Statistics* PayOffs, int s
 
 }
 
-__global__ void Kernel(Seed* SeedVector, Statistics* PayOffs, int streams, MarketData MarketInput, OptionData OptionInput, SimulationParameters Parameters){
+__global__ void Kernel(Seed* SeedVector, Statistics* PayOffs, int streams, MarketData MarketInput, OptionDataContainer OptionInput, SimulationParameters Parameters){
 
     int i = blockDim.x * blockIdx.x + threadIdx.x;
 
@@ -50,7 +67,7 @@ __global__ void Kernel(Seed* SeedVector, Statistics* PayOffs, int streams, Marke
 
 //## Funzione che gira su CPU che restituisce due vettori con sommme dei PayOff e dei PayOff quadrati. ##
 
-__host__ void KernelSimulator(Seed* SeedVector, Statistics* PayOffs, int streams, MarketData MarketInput, OptionData OptionInput, SimulationParameters Parameters, int threads){
+__host__ void KernelSimulator(Seed* SeedVector, Statistics* PayOffs, int streams, MarketData MarketInput, OptionDataContainer OptionInput, SimulationParameters Parameters, int threads){
 
     for(int i=0; i<threads; i++) TrueKernel(SeedVector, PayOffs, streams, MarketInput, OptionInput, Parameters, i);
 

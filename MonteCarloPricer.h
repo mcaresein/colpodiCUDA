@@ -21,7 +21,6 @@ public:
     __device__ __host__ MonteCarloPricer(Option*, StocasticProcess* , int);
     __device__ __host__ void ComputePrice(Statistics*);
 private:
-    MarketData _MarketInput;
     Option* _Option;
     int _NStreams;
     StocasticProcess* _Process;

@@ -10,7 +10,6 @@
 
 
 __device__ __host__ MonteCarloPricer::MonteCarloPricer(Option* Option, StocasticProcess* Process, int NStreams){
-//    _MarketInput=MarketInput;
     _NStreams=NStreams;
     _Option=Option;
     _Process=Process;
@@ -20,10 +19,12 @@ __device__ __host__ MonteCarloPricer::MonteCarloPricer(Option* Option, Stocastic
 
 __device__ __host__ void MonteCarloPricer::ComputePrice(Statistics* PayOffs){
 
+    double* value=new double[_Option->GetNumberOfFixingDate()];
     for(int j=0; j<_NStreams; j++){
-        double* value=new double[_Option->GetNumberOfDatesToSimulate()];
         value=_Option->GetMontecarloPath()->GetPath();
-        double payoff=_Option->GetPayOff(value);
+        double payoff=_Option->GetPayOff(value,_Option->GetNumberOfFixingDate());
         PayOffs->AddValue(payoff);
     }
+    delete[] value;
+
 };

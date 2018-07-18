@@ -19,13 +19,15 @@ public:
   __host__ __device__  MontecarloPath(MarketData, double, int, StocasticProcess*, int EulerSubStep);
   __host__ __device__  ~MontecarloPath();
   __host__ __device__  double* GetPath();
+  __host__ __device__  MarketData GetMarketData();
+
 
 private:
     double* _UnderlyingPath;
     StocasticProcess* _Process;
     MarketData _MarketInput;
     double _MaturityDate;
-    int _NumberOfDatesToSimulate;
+    int _NumberOfFixingDate;
     int _EulerSubStep;
 };
 

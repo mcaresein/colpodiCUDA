@@ -15,32 +15,30 @@
 class Option{
 public:
     __device__ __host__ Option(OptionData, MontecarloPath*);
-    __device__ __host__ int GetNumberOfDatesToSimulate();
-//    __device__ __host__ int GetEulerSubStep();
-//    __device__ __host__ double GetMaturityDate();
-    __device__ __host__  virtual double GetPayOff(double*)=0;
+    __device__ __host__ int GetNumberOfFixingDate();
+    __device__ __host__  virtual double GetPayOff(double*, int)=0;
     __device__ __host__ MontecarloPath* GetMontecarloPath();
 protected:
-    OptionData _OptionInput;
+    OptionData _OptionParameters;
     MontecarloPath* _Path;
 };
 
 class OptionForward: public Option{
 public:
     __device__ __host__ OptionForward(OptionData, MontecarloPath*);
-    __device__ __host__  double GetPayOff(double*);
+    __device__ __host__  double GetPayOff(double*, int NumberOfFixingDate);
 };
 
 class OptionPlainVanilla: public Option{
 public:
     __device__ __host__ OptionPlainVanilla(OptionData, MontecarloPath*);
-    __device__ __host__  double GetPayOff(double*);
+    __device__ __host__  double GetPayOff(double*, int NumberOfFixingDate);
 };
 
 class OptionAbsolutePerformanceBarrier: public Option{
 public:
-    __device__ __host__ OptionAbsolutePerformanceBarrier(OptionData, MontecarloPath*, double Volatility, double InitialPrice);
-    __device__ __host__  double GetPayOff(double*);
+    __device__ __host__ OptionAbsolutePerformanceBarrier(OptionData, MontecarloPath*);
+    __device__ __host__  double GetPayOff(double*, int NumberOfFixingDate);
 private:
     double _Volatility;
     double _InitialPrice;

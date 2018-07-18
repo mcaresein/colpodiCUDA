@@ -9,7 +9,7 @@
 
 using namespace std;
 
-void Reader(MarketData &MarketInput, OptionData &OptionInput, GPUData &GPUInput, SimulationParameters &Parameters){
+void Reader(MarketData &MarketInput, OptionDataContainer &OptionInput, GPUData &GPUInput, SimulationParameters &Parameters){
 
     string InputFile="DATA/input.conf";
     cout<<"Lettura file di input: "<<InputFile<<" ..."<<endl;
@@ -21,7 +21,8 @@ void Reader(MarketData &MarketInput, OptionData &OptionInput, GPUData &GPUInput,
     }
     string temp, word;
     int Threads=0, Streams=0, BlockSize=0;
-    int EulerApproximation=0, OptionType=0;
+    int EulerApproximation=0;
+    char OptionType[32];
     double Volatility=0, Drift=0;
     double InitialPrice=0, MaturityDate=0, StrikePrice=0;
     int DatesToSimulate=0, EulerSubStep=1;
@@ -47,7 +48,7 @@ void Reader(MarketData &MarketInput, OptionData &OptionInput, GPUData &GPUInput,
         }
         if (word=="OPTION_TYPE"){
             file>> temp;
-            OptionType=atoi(temp.c_str());
+            strcpy (OptionType,temp.c_str());
         }
         if (word=="VOLATILITY"){
             file>> temp;
@@ -99,7 +100,9 @@ void Reader(MarketData &MarketInput, OptionData &OptionInput, GPUData &GPUInput,
 
     bool EulerBool=EulerApproximation;
     Parameters.EulerApprox=EulerBool;
-    Parameters.OptionType=OptionType;
+    Parameters.EulerSubStep=EulerSubStep;
+
+    //Parameters.OptionType=OptionType;
 
     MarketInput.Volatility=Volatility;
     MarketInput.Drift=Drift;
@@ -109,25 +112,25 @@ void Reader(MarketData &MarketInput, OptionData &OptionInput, GPUData &GPUInput,
         EulerSubStep=1;
 
     OptionInput.MaturityDate=MaturityDate;
-    OptionInput.NumberOfDatesToSimulate=DatesToSimulate,
-    OptionInput.EulerSubStep=EulerSubStep;
+    OptionInput.NumberOfFixingDate=DatesToSimulate,
     OptionInput.StrikePrice=StrikePrice;
-    OptionInput.OptionTypeCallOrPut=OptionType;
+
+    if(strcmp(OptionType,"FORWARD")==0)
+        OptionInput.OptionType=0;
+
+    if(strcmp(OptionType,"PLAIN_VANILLA_CALL")==0)
+        OptionInput.OptionType=1;
+
+    if(strcmp(OptionType,"PLAIN_VANILLA_PUT")==0)
+        OptionInput.OptionType=2;
+
+    if(strcmp(OptionType,"ABSOLUTE_PERFORMANCE_BARRIER")==0)
+        OptionInput.OptionType=3;
+
     OptionInput.B=ParamB;
     OptionInput.N=ParamN;
     OptionInput.K=ParamK;
 
-    /*
-    if(OptionType==0){
-        *OptionInput = new OptionDataForward(MaturityDate, DatesToSimulate, EulerSubStep);
-    }
-    if(OptionType==1 || OptionType==2){
-        *OptionInput = new OptionDataPlainVanilla(MaturityDate, DatesToSimulate, EulerSubStep, StrikePrice, OptionType);
-    }
-    if(OptionType==3){
-        *OptionInput = new OptionDataAbsolutePerformanceBarrier(MaturityDate, DatesToSimulate, EulerSubStep, ParamB, ParamN, ParamK);
-    }
-    */
 }
 
 void GetSeeds(Seed* SeedVector, int THREADS){
