@@ -34,7 +34,5 @@ Statistics.o: Statistics.cu Statistics.h
 	nvcc -gencode arch=compute_20,code=sm_20 -dc Statistics.cu -o Statistics.o -I. 
 
 clean:
-	rm main.o RandomGenerator.o RandomGeneratorCombined.o StocasticProcess.o UnderlyingPath.o Option.o MonteCarloPricer.o Statistics.o main_comp.o
+	rm *.o
 
-old:
-	mkdir $(date '+%F') && cp  *.h *.cu $(date '+%F')

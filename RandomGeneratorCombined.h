@@ -1,6 +1,9 @@
 #ifndef _RandomGeneratorCombined_h_
 #define _RandomGeneratorCombined_h_
 
+#include "Seed.h"
+#include "RandomGenerator.h"
+
 class RandomGeneratorCombined: public RandomGenerator{
 public:
     __host__ __device__  RandomGeneratorCombined(Seed, bool);

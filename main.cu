@@ -11,7 +11,6 @@
 #include <iostream>
 #include <cstdio>
 #include <ctime>
-#include "MonteCarloPricer.h"
 #include "Statistics.h"
 #include "Seed.h"
 #include "MarketData.h"

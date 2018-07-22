@@ -6,8 +6,6 @@
 #ifndef _RandomGenerator_h_
 #define _RandomGenerator_h_
 
-#include "Seed.h"
-
 class RandomGenerator{
 public:
     __host__ __device__  virtual double GetUniformRandomNumber()=0;

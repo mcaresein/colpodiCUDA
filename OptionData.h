@@ -1,4 +1,3 @@
-
 #ifndef _OptionData_h_
 #define _OptionData_h_
 

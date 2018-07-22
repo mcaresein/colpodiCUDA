@@ -1,7 +1,6 @@
 #ifndef _KernelFunctions_cu_
 #define _KernelFunctions_cu_
 
-#include <iostream>
 #include "MonteCarloPricer.h"
 #include "Statistics.h"
 #include "RandomGenerator.h"
@@ -51,7 +50,7 @@ __host__ __device__ void TrueKernel(Seed* SeedVector, Statistics* PayOffs, int s
         Option=new OptionAbsolutePerformanceBarrier(OptionParameters, Path);
     }
 
-    MonteCarloPricer Pricer(Option, Process, streams);
+    MonteCarloPricer Pricer(Option, streams);
 
     PayOffs[cont].Reset();
     Pricer.ComputePrice(&PayOffs[cont]);

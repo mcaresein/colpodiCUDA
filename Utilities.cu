@@ -102,8 +102,6 @@ void Reader(MarketData &MarketInput, OptionDataContainer &OptionInput, GPUData &
     Parameters.EulerApprox=EulerBool;
     Parameters.EulerSubStep=EulerSubStep;
 
-    //Parameters.OptionType=OptionType;
-
     MarketInput.Volatility=Volatility;
     MarketInput.Drift=Drift;
     MarketInput.EquityInitialPrice=InitialPrice;
