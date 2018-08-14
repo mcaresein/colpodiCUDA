@@ -8,14 +8,20 @@
 
 #include "Option.h"
 #include "Statistics.h"
+#include "MonteCarloPath.h"
+#include "StochasticProcess.h"
+#include "DatesVector.h"
 
 class MonteCarloPricer{
 public:
-    __device__ __host__ MonteCarloPricer(Option*, int);
+    __device__ __host__ MonteCarloPricer(Option*, MonteCarloPath*, StocasticProcess*, int Nstreams, bool AntitheticVariable);
     __device__ __host__ void ComputePrice(Statistics*);
 private:
     Option* _Option;
+    MonteCarloPath* _Path;
+    StocasticProcess* _Process;
     int _NStreams;
+    bool _AntitheticVariable;
 };
 
 #endif

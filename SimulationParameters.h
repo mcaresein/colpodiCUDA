@@ -3,6 +3,7 @@
 
 struct SimulationParameters{
     bool EulerApprox;
+    bool AntitheticVariable;
     int EulerSubStep;
 };
 

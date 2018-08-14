@@ -1,8 +1,8 @@
 #include "RandomGeneratorCombined.h"
 
-__host__ __device__  RandomGeneratorCombined::RandomGeneratorCombined(Seed S, bool ReExtractionBoxMuller){
+__host__ __device__  RandomGeneratorCombined::RandomGeneratorCombined(Seed S, bool BoxMullerWithReExtraction){
     _Seed=S;
-    _ReExtractionBoxMuller=ReExtractionBoxMuller;
+    _BoxMullerWithReExtraction=BoxMullerWithReExtraction;
     _Status=true;
 };
 

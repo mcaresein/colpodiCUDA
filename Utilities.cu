@@ -7,6 +7,8 @@
 #include "GPUData.h"
 #include "SimulationParameters.h"
 
+#define IDUM 1995
+
 using namespace std;
 
 void Reader(MarketData &MarketInput, OptionDataContainer &OptionInput, GPUData &GPUInput, SimulationParameters &Parameters){
@@ -21,7 +23,7 @@ void Reader(MarketData &MarketInput, OptionDataContainer &OptionInput, GPUData &
     }
     string temp, word;
     int Threads=0, Streams=0, BlockSize=0;
-    int EulerApproximation=0;
+    int EulerApproximation=0, Antithetic=0;
     char OptionType[32];
     double Volatility=0, Drift=0;
     double InitialPrice=0, MaturityDate=0, StrikePrice=0;
@@ -45,6 +47,10 @@ void Reader(MarketData &MarketInput, OptionDataContainer &OptionInput, GPUData &
         if (word=="EULER_APPROX"){
             file>> temp;
             EulerApproximation=atoi(temp.c_str());
+        }
+        if (word=="ANTITHETIC_VARIABLE"){
+            file>> temp;
+            Antithetic=atoi(temp.c_str());
         }
         if (word=="OPTION_TYPE"){
             file>> temp;
@@ -98,9 +104,11 @@ void Reader(MarketData &MarketInput, OptionDataContainer &OptionInput, GPUData &
     GPUInput.Streams=Streams;
     GPUInput.BlockSize=BlockSize;
 
+    bool AntitheticVariable=Antithetic;
     bool EulerBool=EulerApproximation;
     Parameters.EulerApprox=EulerBool;
     Parameters.EulerSubStep=EulerSubStep;
+    Parameters.AntitheticVariable=AntitheticVariable;
 
     MarketInput.Volatility=Volatility;
     MarketInput.Drift=Drift;
@@ -133,12 +141,18 @@ void Reader(MarketData &MarketInput, OptionDataContainer &OptionInput, GPUData &
 
 void GetSeeds(Seed* SeedVector, int THREADS){
 
-    srand(17*17);
+    srand(IDUM);
 
     for(int i=0; i<THREADS; i++){
-        SeedVector[i].S1=rand()%(UINT_MAX-128)+128;
-        SeedVector[i].S2=rand()%(UINT_MAX-128)+128;
-        SeedVector[i].S3=rand()%(UINT_MAX-128)+128;
+        do{
+            SeedVector[i].S1=rand();
+        }while(SeedVector[i].S1<128);
+        do{
+            SeedVector[i].S2=rand();
+        }while(SeedVector[i].S2<128);
+        do{
+            SeedVector[i].S3=rand();
+        }while(SeedVector[i].S3<128);
         SeedVector[i].S4=rand();
     }
 };

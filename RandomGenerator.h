@@ -12,7 +12,7 @@ public:
     __host__ __device__  virtual double GetGaussianRandomNumber();
 protected:
     double _SavedRandomNumber;
-    bool _Status, _ReExtractionBoxMuller;
+    bool _Status, _BoxMullerWithReExtraction;
 };
 
 #endif

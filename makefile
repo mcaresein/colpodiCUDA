@@ -1,13 +1,13 @@
-all: main comp
+all: pricer pricer_comp
 
-main: main.o RandomGenerator.o RandomGeneratorCombined.o StocasticProcess.o UnderlyingPath.o Option.o MonteCarloPricer.o Statistics.o
-	nvcc -gencode arch=compute_20,code=sm_20 main.o RandomGenerator.o RandomGeneratorCombined.o StocasticProcess.o UnderlyingPath.o Option.o MonteCarloPricer.o Statistics.o -o pricer
+pricer: main.o RandomGenerator.o RandomGeneratorCombined.o StochasticProcess.o MonteCarloPath.o Option.o MonteCarloPricer.o Statistics.o
+	nvcc -gencode arch=compute_20,code=sm_20 main.o RandomGenerator.o RandomGeneratorCombined.o StochasticProcess.o MonteCarloPath.o Option.o MonteCarloPricer.o Statistics.o -o pricer
 
-main.o: main.cu MonteCarloPricer.h Statistics.h Seed.h OptionData.h SimulationParameters.h GPUData.h MarketData.h
+main.o: main.cu KernelFunctions.cu Utilities.cu MonteCarloPricer.h Statistics.h Seed.h OptionData.h SimulationParameters.h GPUData.h MarketData.h
 	nvcc -gencode arch=compute_20,code=sm_20 -dc main.cu -o main.o -I.
 
-comp: main_comp.o RandomGenerator.o RandomGeneratorCombined.o StocasticProcess.o UnderlyingPath.o Option.o MonteCarloPricer.o Statistics.o 
-	nvcc -gencode arch=compute_20,code=sm_20 main_comp.o RandomGenerator.o RandomGeneratorCombined.o StocasticProcess.o UnderlyingPath.o Option.o MonteCarloPricer.o Statistics.o -o pricer_comp
+pricer_comp: main_comp.o RandomGenerator.o RandomGeneratorCombined.o StochasticProcess.o MonteCarloPath.o Option.o MonteCarloPricer.o Statistics.o 
+	nvcc -gencode arch=compute_20,code=sm_20 main_comp.o RandomGenerator.o RandomGeneratorCombined.o StochasticProcess.o MonteCarloPath.o Option.o MonteCarloPricer.o Statistics.o -o pricer_comp
 
 main_comp.o: main_comp.cu MonteCarloPricer.h Statistics.h Seed.h OptionData.h SimulationParameters.h GPUData.h MarketData.h
 	nvcc -gencode arch=compute_20,code=sm_20 -dc main_comp.cu -o main_comp.o -I.
@@ -18,16 +18,16 @@ RandomGenerator.o: RandomGenerator.cu  RandomGenerator.h RandomGeneratorCombined
 RandomGeneratorCombined.o: RandomGeneratorCombined.cu  RandomGenerator.h RandomGeneratorCombined.h
 	 nvcc -gencode arch=compute_20,code=sm_20 -dc RandomGeneratorCombined.cu -o RandomGeneratorCombined.o -I.
 
-StocasticProcess.o: StocasticProcess.cu StocasticProcess.h
-	nvcc -gencode arch=compute_20,code=sm_20 -dc StocasticProcess.cu -o StocasticProcess.o -I.
+StochasticProcess.o: StochasticProcess.cu StochasticProcess.h
+	nvcc -gencode arch=compute_20,code=sm_20 -dc StochasticProcess.cu -o StochasticProcess.o -I.
 
-UnderlyingPath.o: UnderlyingPath.cu UnderlyingPath.h
-	nvcc -gencode arch=compute_20,code=sm_20 -dc UnderlyingPath.cu -o UnderlyingPath.o -I.
+MonteCarloPath.o: MonteCarloPath.cu MonteCarloPath.h
+	nvcc -gencode arch=compute_20,code=sm_20 -dc MonteCarloPath.cu -o MonteCarloPath.o -I.
 
 Option.o: Option.cu Option.h
 	nvcc -gencode arch=compute_20,code=sm_20 -dc Option.cu -o Option.o -I.
 
-MonteCarloPricer.o: MonteCarloPricer.cu MonteCarloPricer.h RandomGenerator.h StocasticProcess.h UnderlyingPath.h Option.h
+MonteCarloPricer.o: MonteCarloPricer.cu MonteCarloPricer.h RandomGenerator.h StochasticProcess.h MonteCarloPath.h Option.h
 	nvcc -gencode arch=compute_20,code=sm_20 -dc MonteCarloPricer.cu -o MonteCarloPricer.o -I.
 
 Statistics.o: Statistics.cu Statistics.h

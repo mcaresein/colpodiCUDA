@@ -6,10 +6,11 @@ __host__ __device__ double RandomGenerator::GetGaussianRandomNumber(){
     if(_Status==true){
           double u=this->GetUniformRandomNumber();
           double v=this->GetUniformRandomNumber();
-          if(_ReExtractionBoxMuller==false){
-                _SavedRandomNumber=sqrt(-2.*log(u))*sin(2*M_PI*v);
-                _Status=false;
-                return sqrt(-2.*log(u))*cos(2*M_PI*v);
+          if(_BoxMullerWithReExtraction==false){
+              if(u==0) return this->GetGaussianRandomNumber();
+              _SavedRandomNumber=sqrt(-2.*log(u))*sin(2*M_PI*v);
+              _Status=false;
+              return sqrt(-2.*log(u))*cos(2*M_PI*v);
           }
           else{
                 u=2*u-1;
