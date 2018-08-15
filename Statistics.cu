@@ -1,8 +1,5 @@
 #include "Statistics.h"
 #include <cmath>
-#include <iostream>
-#include <string>
-#include <fstream>
 
 using namespace std;
 
@@ -51,18 +48,4 @@ __host__ Statistics Statistics::operator+(const Statistics& statistic){
 	_statistic._Cumulant2=this->_Cumulant2+statistic._Cumulant2;
 	_statistic._Cont=this->_Cont+statistic._Cont;
 	return _statistic;
-};
-
-__host__ void Statistics::Print(double MaturityDate, double Drift){
-	cout<<"Prezzo: "<<this->GetMean()*exp(-MaturityDate*Drift) <<endl;
-  	cout<<"Errore MonteCarlo: "<<this->GetStDev()<<endl;
-};
-
-__host__ void Statistics::Print(double MaturityDate, double Drift, string path){
-	ofstream output;
-	output.open(path.c_str());
-	output<<"Prezzo: "<<this->GetMean()*exp(-MaturityDate*Drift)<<endl;
-  	output<<"Errore MonteCarlo: "<<this->GetStDev()<<endl;
-	cout  <<"Risultati salvati nel file "<<path<<endl;
-	output.close();
 };

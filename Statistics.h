@@ -8,9 +8,6 @@
 #ifndef _Statistics_h_
 #define _Statistics_h_
 
-#include <iostream>
-#include <string>
-
 class Statistics{
 public:
 	__host__ __device__ Statistics();
@@ -22,8 +19,6 @@ public:
 	__host__ double GetMean();
 	__host__ double GetStDev();
 	__host__ Statistics operator+(const Statistics& statistic);
-	__host__ void Print(double MaturityDate,double Drift);
-	__host__ void Print(double MaturityDate, double Drift,std::string);
 
 private:
 	double _Cumulant;

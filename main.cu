@@ -8,84 +8,16 @@
 # Output: Prezzo stimato secondo il Pay Off specificato e corrispondente errore MonteCarlo.                                                                    #
 ##############################################################################################################################################################*/
 
-#include <iostream>
-#include <cstdio>
-#include <ctime>
-#include "Statistics.h"
-#include "Seed.h"
-#include "MarketData.h"
-#include "OptionData.h"
-#include "GPUData.h"
-#include "SimulationParameters.h"
-#include "KernelFunctions.cu"
-#include "Utilities.cu"
+#define SEED 1995
+#define INPUT_FILE "DATA/input.conf"
+#define OUTPUT_FILE "DATA/output.dat"
 
-using namespace std;
+#include "MCSimulator.h"
 
 int main(){
-//## Inizializzazione parametri di mercato e opzione. ##########################
 
-    MarketData MarketInput;
-    OptionDataContainer OptionInput;
-    SimulationParameters Parameters;
-    GPUData GPUInput;
+    //## implementazione: vedi file MCSimulator.cu #############################
+    MCSimulator MCSim(SEED, INPUT_FILE, OUTPUT_FILE);
+    return MCSim.main();
 
-    Reader(MarketInput, OptionInput, GPUInput, Parameters);
-
-//## Allocazione di memoria. ###################################################
-
-    Statistics* PayOffs;
-    Seed *SeedVector;
-
-    Statistics* _PayOffs;
-    Seed *_SeedVector;
-
-    size_t sizeSeedVector = GPUInput.Threads * sizeof(Seed);
-    size_t sizeDevStVector = GPUInput.Threads * sizeof(Statistics);
-
-    MemoryAllocationGPU(& PayOffs,  & SeedVector, & _PayOffs, & _SeedVector, sizeSeedVector, sizeDevStVector, GPUInput.Threads);
-
-//## Costruzione vettore dei seed. #############################################
-
-    GetSeeds(SeedVector, GPUInput.Threads);
-
-    cudaMemcpy(_SeedVector, SeedVector, sizeSeedVector, cudaMemcpyHostToDevice);
-
-//## Calcolo dei PayOff su GPU. ################################################
-
-    cout<<"Simulazione..."<<endl;
-
-    int gridSize = (GPUInput.Threads + GPUInput.BlockSize - 1) / GPUInput.BlockSize;
-
-    cudaEvent_t start, stop;
-    cudaEventCreate(&start);
-    cudaEventCreate(&stop);
-
-    cudaEventRecord(start);
-    Kernel<<<gridSize, GPUInput.BlockSize>>>(_SeedVector, _PayOffs, GPUInput.Streams, MarketInput, OptionInput, Parameters);
-    cudaEventRecord(stop);
-
-    cudaMemcpy(PayOffs, _PayOffs, sizeDevStVector, cudaMemcpyDeviceToHost);
-
-    cudaEventSynchronize(stop);
-    float milliseconds = 0;
-    cudaEventElapsedTime(&milliseconds, start, stop);
-
-//## Calcolo e stampa su file dei valori. ######################################
-
-    Statistics FinalStatistics;
-    for (int i=0; i<GPUInput.Threads; i++){
-      FinalStatistics=FinalStatistics+PayOffs[i];
-    };
-    cout<<endl<<"Valori ottenuti: "<<endl;
-    FinalStatistics.Print(OptionInput.MaturityDate, MarketInput.Drift);
-    cout<<"Tempo di calcolo: "<<milliseconds<<" ms"<<endl<<endl;
-    FinalStatistics.Print(OptionInput.MaturityDate, MarketInput.Drift,"DATA/output.dat");
-
-
-//## Liberazione memoria. ######################################################
-
-    MemoryDeallocationGPU(PayOffs, SeedVector, _PayOffs, _SeedVector);
-
-    return 0;
 }
