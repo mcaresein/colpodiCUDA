@@ -12,7 +12,8 @@
 ----- LIBRERIA PER OPTION PRICING ----- PRODUZIONE ARTIGIANALE -----
 
 PER USARE IL PROGRAMMA:
-Il makefile crea due oggetti eseguibili: "pricer" e "pricer_comp", il primo sfrutta unicamente la GPU, il secondo esegue il confronto tra i risultati ottenuti su CPU e GPU.
-Il file contenente i dati di input viene specificato nella funziore "Reader" nel file Utilities.cu (di default è impostato il file "input.conf" nella cartella "DATA"). 
+Il makefile crea un eseguibile chiamato "pricer".
+Il file contenente i dati di input viene specificato al compilatore nel file main.cu (di default è impostato il file "input.conf" nella cartella "DATA").
+Si veda il file "input.conf" di esempio per i parametri da utilizzare.
 
 Ultimo aggiornamento: sa dio
