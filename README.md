@@ -12,7 +12,7 @@
 ----- LIBRERIA PER OPTION PRICING ----- PRODUZIONE ARTIGIANALE -----
 
 PER USARE IL PROGRAMMA:
-Il makefile crea un eseguibile chiamato "pricer".
+Il makefile crea il programma eseguibile chiamato "pricer" per la simulazione Monte Carlo e un test di non regressione chiamato "test", compilabile col comando "make test".
 Il file contenente i dati di input viene specificato al compilatore nel file main.cu (di default è impostato il file "input.conf" nella cartella "DATA").
 Si veda il file "input.conf" di esempio per i parametri da utilizzare.
 
