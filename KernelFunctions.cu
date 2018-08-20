@@ -13,7 +13,7 @@ __host__ __device__ void TrueKernel(Seed* SeedVector, Statistics* PayOffs, int s
     UnderlyingAnagraphy* Anagraphy=new UnderlyingAnagraphy(MarketInput);
     UnderlyingPrice* Price=new UnderlyingPrice(Anagraphy);
 
-    MonteCarloPath* Path=new MonteCarloPath(Price, MarketInput.EquityInitialPrice, OptionInput.MaturityDate, OptionInput.NumberOfFixingDate, Parameters.EulerSubStep);
+    MonteCarloPath* Path=new MonteCarloPath(Price, MarketInput.EquityInitialPrice, OptionInput.MaturityDate, OptionInput.NumberOfFixingDate, Parameters.EulerSubStep, Parameters.AntitheticVariable);
 
     OptionData OptionParameters;
     OptionParameters.MaturityDate=OptionInput.MaturityDate;

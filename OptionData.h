@@ -2,7 +2,7 @@
 #define _OptionData_h_
 
 struct OptionDataContainer{
-    double  MaturityDate;
+    double MaturityDate;
     int NumberOfFixingDate;
     double StrikePrice;
     int OptionType;

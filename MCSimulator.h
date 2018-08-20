@@ -58,4 +58,5 @@ private:
 public:
     MCSimulator(int Seed, string InputFile, string OutputFile);
     int main();
+    int RegressionTest();
 };

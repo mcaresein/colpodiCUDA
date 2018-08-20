@@ -1,6 +1,12 @@
 pricer: main.o MCSimulator.o KernelFunctions.o RandomGenerator.o RandomGeneratorCombined.o StochasticProcess.o MonteCarloPath.o Option.o MonteCarloPricer.o Statistics.o
 	nvcc -gencode arch=compute_20,code=sm_20 main.o MCSimulator.o KernelFunctions.o RandomGenerator.o RandomGeneratorCombined.o StochasticProcess.o MonteCarloPath.o Option.o MonteCarloPricer.o Statistics.o -o pricer
 
+test: RegressionTest.o MCSimulator.o KernelFunctions.o RandomGenerator.o RandomGeneratorCombined.o StochasticProcess.o MonteCarloPath.o Option.o MonteCarloPricer.o Statistics.o
+	nvcc -gencode arch=compute_20,code=sm_20 RegressionTest.o MCSimulator.o KernelFunctions.o RandomGenerator.o RandomGeneratorCombined.o StochasticProcess.o MonteCarloPath.o Option.o MonteCarloPricer.o Statistics.o -o test
+
+RegressionTest.o: RegressionTest.cu
+	nvcc -gencode arch=compute_20,code=sm_20 -dc RegressionTest.cu -o RegressionTest.o -I.
+
 main.o: main.cu 
 	nvcc -gencode arch=compute_20,code=sm_20 -dc main.cu -o main.o -I.
 

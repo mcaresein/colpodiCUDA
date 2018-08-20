@@ -61,6 +61,7 @@ int MCSimulator::main(){
     for (int i=0; i<GPUInput.Threads; i++)
         FinalStatisticsGPU=FinalStatisticsGPU+PayOffsGPU[i];
 
+
     if(CPUComparison==true){
         for (int i=0; i<GPUInput.Threads; i++)
             FinalStatisticsCPU=FinalStatisticsCPU+PayOffsCPU[i];
@@ -201,6 +202,7 @@ void MCSimulator::Reader(string InputFile, MarketData &MarketInput, OptionDataCo
     if(file.fail()){
         cout<< "ERROR: input file not found! "<<  endl;
         output<< "ERROR: input file not found! "<<  endl;
+        exit(1);
     }
     string temp, word;
     int Threads=0, Streams=0, BlockSize=0;
@@ -329,3 +331,64 @@ void MCSimulator::Reader(string InputFile, MarketData &MarketInput, OptionDataCo
     output<<"CPU comparison: "<<CPUComparison<<endl;
 
 }
+
+//## Test di non-regressione ###################################################
+
+int MCSimulator::RegressionTest(){
+
+    //## Opzione di benchmark: Plain Vanilla Call coi seguenti parametri: ######
+
+    MarketInput.Volatility=0.1;
+    MarketInput.Drift=0.001;
+    MarketInput.EquityInitialPrice=100.;
+
+    OptionInput.MaturityDate=1.;
+    OptionInput.NumberOfFixingDate=1;
+    OptionInput.StrikePrice=100.;
+    OptionInput.OptionType=1;
+
+    GPUInput.Threads=5120;
+    GPUInput.Streams=5000;
+    GPUInput.BlockSize=512;
+
+    Parameters.EulerApprox=0;
+    Parameters.AntitheticVariable=0;
+    Parameters.EulerSubStep=1;
+
+    sizeSeedVector = GPUInput.Threads * sizeof(Seed);
+    sizeDevStVector = GPUInput.Threads * sizeof(Statistics);
+    MemoryAllocationGPU(& PayOffsGPU,  & SeedVector, & _PayOffsGPU, & _SeedVector, sizeSeedVector, sizeDevStVector, GPUInput.Threads);
+
+    GetSeeds(SeedVector, GPUInput.Threads, _Seed);
+    cudaMemcpy(_SeedVector, SeedVector, sizeSeedVector, cudaMemcpyHostToDevice);
+
+    cout<<"Simulating test..."<<endl;
+
+    gridSize = (GPUInput.Threads + GPUInput.BlockSize - 1) / GPUInput.BlockSize;
+    Kernel<<<gridSize, GPUInput.BlockSize>>>(_SeedVector, _PayOffsGPU, GPUInput.Streams, MarketInput, OptionInput, Parameters);
+
+    cudaMemcpy(PayOffsGPU, _PayOffsGPU, sizeDevStVector, cudaMemcpyDeviceToHost);
+
+    for (int i=0; i<GPUInput.Threads; i++)
+        FinalStatisticsGPU=FinalStatisticsGPU+PayOffsGPU[i];
+
+    if(FinalStatisticsGPU.GetMean()==4.0411858633024114)
+        cout<<"PASSED!"<<endl;
+    else{
+        cout<<"FAILED!: "<<endl;
+        cout<<"Expected price: "<<4.0411858633024114*exp(OptionInput.NumberOfFixingDate*MarketInput.Drift)<<endl;
+        cout<<"Obtained price: "<<FinalStatisticsGPU.GetMean()*exp(OptionInput.NumberOfFixingDate*MarketInput.Drift)<<endl;
+
+    }
+    if(FinalStatisticsGPU.GetStDev()==0.0012322640294403595)
+        cout<<"PASSED!"<<endl;
+    else{
+        cout<<"FAILED!: "<<endl;
+        cout<<"Expected MC error: "<<0.0012322640294403595<<endl;
+        cout<<"Obtained MC error: "<<FinalStatisticsGPU.GetStDev()<<endl;
+    }
+
+    MemoryDeallocationGPU(PayOffsGPU, SeedVector, _PayOffsGPU, _SeedVector);
+
+    return 0;
+};
