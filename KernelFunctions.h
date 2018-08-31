@@ -7,6 +7,8 @@
 #include "Statistics.h"
 #include "RandomGenerator.h"
 #include "RandomGeneratorCombined.h"
+#include "Gaussian.h"
+#include "RandomGeneratorCombinedGaussian.h"
 #include "Seed.h"
 #include "MarketData.h"
 #include "OptionData.h"

@@ -4,6 +4,7 @@
 struct SimulationParameters{
     bool EulerApprox;
     bool AntitheticVariable;
+    int ProcessType;
     int EulerSubStep;
 };
 

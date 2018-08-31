@@ -1,14 +1,23 @@
 #include "KernelFunctions.h"
+#include <iostream>
 
 __host__ __device__ void TrueKernel(Seed* SeedVector, Statistics* PayOffs, int streams, MarketData MarketInput, OptionDataContainer OptionInput, SimulationParameters Parameters, int cont){
 
-    RandomGenerator* Generator= new RandomGeneratorCombined(SeedVector[cont], RE_EXTRACTION_BOX_MULLER);
+    RandomGenerator* Generator;
 
-    StocasticProcess* Process;
-    if(Parameters.EulerApprox==false)
-        Process=new ExactLogNormalProcess(Generator);
-    if(Parameters.EulerApprox==true)
-        Process=new EulerLogNormalProcess(Generator);
+    StochasticProcess* Process;
+
+    if(Parameters.ProcessType==0){
+        Generator=new RandomGeneratorCombinedGaussian(SeedVector[cont], RE_EXTRACTION_BOX_MULLER);
+        if(Parameters.EulerApprox==false)
+          Process=new ExactLogNormalProcess(Generator);
+        if(Parameters.EulerApprox==true)
+          Process=new EulerLogNormalProcess(Generator);
+    };
+
+/*    #ifndef _CUDA_ARCH_
+    std::cout<< Generator->GetRandomVariable()<< std::endl;
+    #endif*/
 
     UnderlyingAnagraphy* Anagraphy=new UnderlyingAnagraphy(MarketInput);
     UnderlyingPrice* Price=new UnderlyingPrice(Anagraphy);

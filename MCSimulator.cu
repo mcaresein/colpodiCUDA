@@ -207,7 +207,7 @@ void MCSimulator::Reader(string InputFile, MarketData &MarketInput, OptionDataCo
     string temp, word;
     int Threads=0, Streams=0, BlockSize=0;
     int EulerApproximation=0, Antithetic=0;
-    char OptionType[32];
+    char OptionType[32], ProcessType[32];
     double Volatility=0, Drift=0;
     double InitialPrice=0, MaturityDate=0, StrikePrice=0;
     int DatesToSimulate=0, EulerSubStep=1;
@@ -234,6 +234,10 @@ void MCSimulator::Reader(string InputFile, MarketData &MarketInput, OptionDataCo
         if (word=="ANTITHETIC_VARIABLE"){
             file>> temp;
             Antithetic=atoi(temp.c_str());
+        }
+        if (word=="PROCESS_TYPE"){
+            file>> temp;
+            strcpy (ProcessType,temp.c_str());
         }
         if (word=="OPTION_TYPE"){
             file>> temp;
@@ -308,6 +312,9 @@ void MCSimulator::Reader(string InputFile, MarketData &MarketInput, OptionDataCo
     OptionInput.NumberOfFixingDate=DatesToSimulate,
     OptionInput.StrikePrice=StrikePrice;
 
+    if(strcmp(ProcessType,"LOGNORMAL")==0)
+        Parameters.ProcessType=0;
+
     if(strcmp(OptionType,"FORWARD")==0)
         OptionInput.OptionType=0;
 
@@ -330,7 +337,7 @@ void MCSimulator::Reader(string InputFile, MarketData &MarketInput, OptionDataCo
     output<<"Thread per block requested: "<< GPUInput.BlockSize <<endl;
     output<<"CPU comparison: "<<CPUComparison<<endl;
 
-}
+};
 
 //## Test di non-regressione ###################################################
 
@@ -354,6 +361,7 @@ int MCSimulator::RegressionTest(){
     Parameters.EulerApprox=0;
     Parameters.AntitheticVariable=0;
     Parameters.EulerSubStep=1;
+    Parameters.ProcessType=0;
 
     sizeSeedVector = GPUInput.Threads * sizeof(Seed);
     sizeDevStVector = GPUInput.Threads * sizeof(Statistics);

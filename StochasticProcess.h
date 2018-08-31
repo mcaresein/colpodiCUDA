@@ -10,26 +10,24 @@
 #include "MarketData.h"
 #include "UnderlyingPrice.h"
 
-class StocasticProcess{
+class StochasticProcess{
 public:
-    __host__ __device__ virtual void Step(UnderlyingPrice*, double TimeStep, double RandomNumber)=0;
-    __host__ __device__ virtual double GetRandomNumber()=0;
+    __host__ __device__ virtual void Step(UnderlyingPrice*, double TimeStep)=0;
+    __host__ __device__ double GetRandomNumber();
 protected:
     RandomGenerator* _Generator;
 };
 
-class ExactLogNormalProcess: public StocasticProcess{
+class ExactLogNormalProcess: public StochasticProcess{
 public:
     __host__ __device__ ExactLogNormalProcess(RandomGenerator* Generator);
-    __host__ __device__ void Step(UnderlyingPrice * Step, double TimeStep, double RandomNumber);
-    __host__ __device__ double GetRandomNumber();
+    __host__ __device__ void Step(UnderlyingPrice * Step, double TimeStep);
 };
 
-class EulerLogNormalProcess: public StocasticProcess{
+class EulerLogNormalProcess: public StochasticProcess{
 public:
     __host__ __device__ EulerLogNormalProcess(RandomGenerator* Generator);
-    __host__ __device__ void Step(UnderlyingPrice * Step, double TimeStep, double RandomNumber);
-    __host__ __device__ double GetRandomNumber();
+    __host__ __device__ void Step(UnderlyingPrice * Step, double TimeStep);
 };
 
 #endif

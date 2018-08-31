@@ -15,8 +15,8 @@ class MonteCarloPath{
 public:
     __host__ __device__ MonteCarloPath(UnderlyingPrice* , double EquityInitialPrice, double MaturityDate, int NumberOfFixingDate, int EulerSubStep, bool AntitheticVariable);
     __host__ __device__ ~MonteCarloPath();
-    __host__ __device__ DatesVector GetPath(StocasticProcess*);
-    __host__ __device__ DatesVector GetAntitheticPath(StocasticProcess*);
+    __host__ __device__ DatesVector GetPath(StochasticProcess*);
+    __host__ __device__ DatesVector GetAntitheticPath(StochasticProcess*);
 private:
     double* _UnderlyingPath;
     double* _RandomNumbers;
