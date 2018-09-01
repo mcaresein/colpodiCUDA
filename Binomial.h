@@ -1,12 +1,9 @@
 #ifndef _Binomial_h_
 #define _Binomial_h_
-#include "Seed.h"
-#include "RandomGenerator.h"
 
-class Binomial: public RandomGenerator{
+class Binomial: {
 public:
-    __host__ __device__  virtual double GetBinomialRandomNumber();
-
+    __host__ __device__  virtual double GetBinomialRandomNumber(double RN);
 };
 
 #endif
