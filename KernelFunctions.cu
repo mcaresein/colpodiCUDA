@@ -8,16 +8,16 @@ __host__ __device__ void TrueKernel(Seed* SeedVector, Statistics* PayOffs, int s
     StochasticProcess* Process;
 
     if(Parameters.ProcessType==0){
-        Generator=new RandomGeneratorCombinedBinomial(SeedVector[cont], RE_EXTRACTION_BOX_MULLER);
+        Generator=new RandomGeneratorCombinedBinomial(SeedVector[cont]);
         if(Parameters.EulerApprox==false)
           Process=new ExactLogNormalProcess(Generator);
         if(Parameters.EulerApprox==true)
           Process=new EulerLogNormalProcess(Generator);
     };
 
-/*    #ifndef _CUDA_ARCH_
-    std::cout<< Generator->GetRandomVariable()<< std::endl;
-    #endif*/
+    #ifndef _CUDA_ARCH_
+    //std::cout<< Generator->GetRandomVariable()<< std::endl;
+    #endif
 
     UnderlyingAnagraphy* Anagraphy=new UnderlyingAnagraphy(MarketInput);
     UnderlyingPrice* Price=new UnderlyingPrice(Anagraphy);

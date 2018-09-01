@@ -1,0 +1,19 @@
+Simulation parameters:
+Input file: DATA/input.conf
+Number of blocks requested: 10
+Thread per block requested: 512
+CPU comparison: 1
+
+GPU values:
+Price: 16.4789
+MC error: 0.00339081
+Simulation time: 535.492 ms
+
+CPU values:
+Price: 16.4789
+MC error: 0.00339081
+Simulation time: 3376.43 ms
+
+Prices are equivalent!
+Errors are equivalent!
+Performance gain: 6.30529 x
