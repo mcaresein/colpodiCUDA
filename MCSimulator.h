@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <ctime>
 #include <fstream>
+#include <iomanip>
 #include "Statistics.h"
 #include "Seed.h"
 #include "MarketData.h"

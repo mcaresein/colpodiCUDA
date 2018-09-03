@@ -155,11 +155,14 @@ void MCSimulator::MemoryDeallocationGPU(Statistics* PayOffsGPU, Seed* SeedVector
 };
 
 void MCSimulator::PrintActualizedPrice(Statistics Stat ,double MaturityDate, double Drift, ofstream& output){
-    cout<<"Price: "<<Stat.GetMean()*exp(-MaturityDate*Drift) <<endl;
-    cout<<"MC error: "<<Stat.GetStDev()<<endl;
+    double ActualizedPrice=Stat.GetMean()*exp(-MaturityDate*Drift);
+    double MCError=Stat.GetStDev();
 
-    output<<"Price: "<<Stat.GetMean()*exp(-MaturityDate*Drift)<<endl;
-    output<<"MC error: "<<Stat.GetStDev()<<endl;
+    cout<<"Price: "<<ActualizedPrice<<endl;
+    output<<"Price: "<<ActualizedPrice<<endl;
+
+    cout<<"MC error: "<<MCError<<endl;
+    output<<"MC error: "<<MCError<<endl;
 };
 
 void MCSimulator::PrintComparison(Statistics FinalStatisticsGPU, Statistics FinalStatisticsCPU, ofstream& output){
@@ -376,8 +379,8 @@ int MCSimulator::RegressionTest(){
         cout<<"PASSED!"<<endl;
     else{
         cout<<"FAILED!: "<<endl;
-        cout<<"Expected price: "<<4.0411858633024114*exp(OptionInput.NumberOfFixingDate*MarketInput.Drift)<<endl;
-        cout<<"Obtained price: "<<FinalStatisticsGPU.GetMean()*exp(OptionInput.NumberOfFixingDate*MarketInput.Drift)<<endl;
+        cout<<"Expected price: "<<4.0411858633024114*exp(-1.*OptionInput.MaturityDate*MarketInput.Drift)<<endl;
+        cout<<"Obtained price: "<<FinalStatisticsGPU.GetMean()*exp(-1.*OptionInput.MaturityDate*MarketInput.Drift)<<endl;
 
     }
     if(FinalStatisticsGPU.GetStDev()==0.0012322640294403595)
