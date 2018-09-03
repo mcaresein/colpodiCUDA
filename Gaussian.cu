@@ -4,6 +4,7 @@
 
  __host__ __device__ Gaussian::Gaussian(bool BoxMullerWithReExtraction){
   _BoxMullerWithReExtraction=BoxMullerWithReExtraction;
+  _Status=true;
 }
  __host__ __device__ double Gaussian::GetGaussianRandomNumber(double RN1, double RN2){
   if(_Status==true){
