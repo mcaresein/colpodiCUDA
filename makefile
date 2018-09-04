@@ -19,7 +19,6 @@ Gaussian.o: Gaussian.cu Gaussian.h
 Binomial.o: Binomial.cu Binomial.h
 	nvcc -gencode arch=compute_20,code=sm_20 -dc Binomial.cu -o Binomial.o -I.
 
-
 KernelFunctions.o: KernelFunctions.cu KernelFunctions.h
 	nvcc -gencode arch=compute_20,code=sm_20 -dc KernelFunctions.cu -o KernelFunctions.o -I.
 
@@ -35,10 +34,10 @@ RandomGeneratorCombinedGaussian.o:RandomGeneratorCombinedGaussian.cu RandomGener
 RandomGeneratorCombinedBinomial.o:RandomGeneratorCombinedBinomial.cu RandomGenerator.h RandomGeneratorCombined.h RandomGeneratorCombinedBinomial.h Binomial.h
 	nvcc -gencode arch=compute_20,code=sm_20 -dc RandomGeneratorCombinedBinomial.cu -o RandomGeneratorCombinedBinomial.o -I.
 
-StochasticProcess.o: StochasticProcess.cu StochasticProcess.h
+StochasticProcess.o: StochasticProcess.cu StochasticProcess.h RandomGenerator.h
 	nvcc -gencode arch=compute_20,code=sm_20 -dc StochasticProcess.cu -o StochasticProcess.o -I.
 
-MonteCarloPath.o: MonteCarloPath.cu MonteCarloPath.h
+MonteCarloPath.o: MonteCarloPath.cu MonteCarloPath.h RandomGenerator.h
 	nvcc -gencode arch=compute_20,code=sm_20 -dc MonteCarloPath.cu -o MonteCarloPath.o -I.
 
 Option.o: Option.cu Option.h

@@ -7,7 +7,7 @@
 class RandomGeneratorCombinedGaussian: public RandomGeneratorCombined, public Gaussian{
 public:
     __host__ __device__  RandomGeneratorCombinedGaussian(Seed seed, bool BoxMullerWithReExtraction): RandomGeneratorCombined(seed), Gaussian(BoxMullerWithReExtraction){};
-    __host__ __device__  double GetRandomVariable();
+    __host__ __device__  void SetRandomNumber();
 };
 
 #endif
