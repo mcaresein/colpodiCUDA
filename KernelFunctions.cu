@@ -3,7 +3,11 @@
 
 __host__ __device__ void TrueKernel(Seed* SeedVector, Statistics* PayOffs, int streams, MarketData MarketInput, OptionDataContainer OptionInput, SimulationParameters Parameters, int cont){
 
-    RandomGenerator* Generator=new RandomGeneratorCombinedGaussian(SeedVector[cont],RE_EXTRACTION_BOX_MULLER);
+    RandomGenerator* Generator;
+    if(Parameters.ProcessType==0)
+      Generator=new RandomGeneratorCombinedGaussian(SeedVector[cont],RE_EXTRACTION_BOX_MULLER);
+    if(Parameters.ProcessType==1)
+      Generator=new RandomGeneratorCombinedBinomial(SeedVector[cont]);
 
     StochasticProcess* Process;
     if(Parameters.EulerApprox==false)

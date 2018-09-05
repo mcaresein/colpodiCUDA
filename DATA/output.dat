@@ -5,15 +5,15 @@ Thread per block requested: 512
 CPU comparison: 1
 
 GPU values:
-Price: 13.7563
-MC error: 0.00457313
-Simulation time: 469.884 ms
+Price: 16.4842
+MC error: 0.00339082
+Simulation time: 482.694 ms
 
 CPU values:
-Price: 13.7563
-MC error: 0.00457313
-Simulation time: 3793.45 ms
+Price: 16.4842
+MC error: 0.00339082
+Simulation time: 2892.23 ms
 
 Prices are equivalent!
 Errors are equivalent!
-Performance gain: 8.07318 x
+Performance gain: 5.99186 x

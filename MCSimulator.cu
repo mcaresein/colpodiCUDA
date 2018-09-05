@@ -312,8 +312,11 @@ void MCSimulator::Reader(string InputFile, MarketData &MarketInput, OptionDataCo
     OptionInput.NumberOfFixingDate=DatesToSimulate,
     OptionInput.StrikePrice=StrikePrice;
 
-    if(strcmp(ProcessType,"LOGNORMAL")==0)
+    if(strcmp(ProcessType,"LOGNORMALSTD")==0)
         Parameters.ProcessType=0;
+
+    if(strcmp(ProcessType,"LOGNORMALBIN")==0)
+        Parameters.ProcessType=1;
 
     if(strcmp(OptionType,"FORWARD")==0)
         OptionInput.OptionType=0;

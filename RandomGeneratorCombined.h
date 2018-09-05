@@ -6,7 +6,7 @@ class RandomGeneratorCombined: public RandomGenerator{
 public:
     __host__ __device__  RandomGeneratorCombined(Seed);
     __host__ __device__  double GetUniformRandomNumber();
-    //__host__ __device__  void SetRandomNumber(){};
+    //__host__ __device__  virtual void SetRandomNumber()=0;
 protected:
     Seed _Seed;
 private:

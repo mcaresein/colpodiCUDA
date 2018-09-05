@@ -25,7 +25,8 @@ __host__ __device__  DatesVector MonteCarloPath::GetPath(StochasticProcess* Proc
 
     for(int i=0; i<_NumberOfFixingDate; i++){
         for(int j=0; j<_EulerSubStep; j++){
-          double rnd=Process->GetRandomGenerator()->GetRandomNumber();
+          Process->GetRandomGenerator()->SetRandomNumber();
+          double rnd=Process->GetRandomNumber();
           Process->Step(_Step, TimeStep, rnd);
           if(_AntitheticVariable==true)
             _RandomNumbers[i*_EulerSubStep+j]=rnd;

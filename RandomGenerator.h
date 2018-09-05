@@ -12,7 +12,7 @@ class RandomGenerator{
 public:
     __host__ __device__  virtual double GetUniformRandomNumber()=0;
     __host__ __device__  double GetRandomNumber();
-    __host__ __device__  virtual void SetRandomNumber();
+    __host__ __device__  virtual void SetRandomNumber()=0;
 protected:
     double _RandomNumber;
 };

@@ -4,9 +4,15 @@
 __host__ __device__ ExactLogNormalProcess::ExactLogNormalProcess(RandomGenerator* Generator){
     _Generator=Generator;
 };
+
 __host__ __device__ RandomGenerator* StochasticProcess::GetRandomGenerator(){
     return _Generator;
 };
+
+__host__ __device__ double StochasticProcess::GetRandomNumber(){
+  return _Generator->GetRandomNumber();
+};
+
 __host__ __device__ void ExactLogNormalProcess::Step(UnderlyingPrice * Step, double TimeStep, double RandomNumber){
     double Drift=Step->Anagraphy->Drift;
     double Volatility=Step->Anagraphy->Volatility;
