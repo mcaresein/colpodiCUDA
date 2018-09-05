@@ -1,6 +1,6 @@
 #include "MonteCarloPricer.h"
 
-__device__ __host__ MonteCarloPricer::MonteCarloPricer(Option* Option, MonteCarloPath* Path, StocasticProcess* Process, int NStreams, bool AntitheticVariable){
+__device__ __host__ MonteCarloPricer::MonteCarloPricer(Option* Option, MonteCarloPath* Path, StochasticProcess* Process, int NStreams, bool AntitheticVariable){
     _NStreams=NStreams;
     _Option=Option;
     _Path=Path;

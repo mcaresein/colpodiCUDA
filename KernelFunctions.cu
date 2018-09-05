@@ -1,14 +1,19 @@
 #include "KernelFunctions.h"
+#include <iostream>
 
 __host__ __device__ void TrueKernel(Seed* SeedVector, Statistics* PayOffs, int streams, MarketData MarketInput, OptionDataContainer OptionInput, SimulationParameters Parameters, int cont){
 
-    RandomGenerator* Generator= new RandomGeneratorCombined(SeedVector[cont], RE_EXTRACTION_BOX_MULLER);
+    RandomGenerator* Generator;
+    if(Parameters.ProcessType==0)
+      Generator=new RandomGeneratorCombinedGaussian(SeedVector[cont],RE_EXTRACTION_BOX_MULLER);
+    if(Parameters.ProcessType==1)
+      Generator=new RandomGeneratorCombinedBinomial(SeedVector[cont]);
 
-    StocasticProcess* Process;
+    StochasticProcess* Process;
     if(Parameters.EulerApprox==false)
-        Process=new ExactLogNormalProcess(Generator);
+      Process=new ExactLogNormalProcess(Generator);
     if(Parameters.EulerApprox==true)
-        Process=new EulerLogNormalProcess(Generator);
+      Process=new EulerLogNormalProcess(Generator);
 
     UnderlyingAnagraphy* Anagraphy=new UnderlyingAnagraphy(MarketInput);
     UnderlyingPrice* Price=new UnderlyingPrice(Anagraphy);

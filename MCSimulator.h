@@ -10,6 +10,9 @@
 #include "GPUData.h"
 #include "SimulationParameters.h"
 #include "KernelFunctions.h"
+#include "RandomGenerator.h"
+#include "RandomGeneratorCombined.h"
+
 
 using namespace std;
 

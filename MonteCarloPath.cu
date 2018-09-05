@@ -1,5 +1,6 @@
 #include "MonteCarloPath.h"
-
+#include <iostream>
+//new
 __host__ __device__  MonteCarloPath::MonteCarloPath(UnderlyingPrice* Price, double EquityInitialPrice, double MaturityDate, int NumberOfFixingDate, int EulerSubStep, bool AntitheticVariable){
     _MaturityDate=MaturityDate;
     _NumberOfFixingDate=NumberOfFixingDate;
@@ -17,17 +18,18 @@ __host__ __device__  MonteCarloPath::~MonteCarloPath(){
     if(_AntitheticVariable==true)
         delete[] _RandomNumbers;
 };
-
-__host__ __device__  DatesVector MonteCarloPath::GetPath(StocasticProcess* Process){
+//new
+__host__ __device__  DatesVector MonteCarloPath::GetPath(StochasticProcess* Process){
     double TimeStep =  _MaturityDate / (_NumberOfFixingDate*_EulerSubStep);
     _Step->Price=_EquityInitialPrice;
 
     for(int i=0; i<_NumberOfFixingDate; i++){
         for(int j=0; j<_EulerSubStep; j++){
-            double rnd=Process->GetRandomNumber();
-            Process->Step(_Step, TimeStep, rnd);
-            if(_AntitheticVariable==true)
-                _RandomNumbers[i*_EulerSubStep+j]=rnd;
+          Process->GetRandomGenerator()->SetRandomNumber();
+          double rnd=Process->GetRandomNumber();
+          Process->Step(_Step, TimeStep, rnd);
+          if(_AntitheticVariable==true)
+            _RandomNumbers[i*_EulerSubStep+j]=rnd;
         }
         _UnderlyingPath[i]=_Step->Price;
     }
@@ -38,7 +40,7 @@ __host__ __device__  DatesVector MonteCarloPath::GetPath(StocasticProcess* Proce
     return Dates;
 };
 
-__host__ __device__  DatesVector MonteCarloPath::GetAntitheticPath(StocasticProcess* Process){
+__host__ __device__  DatesVector MonteCarloPath::GetAntitheticPath(StochasticProcess* Process){
     double TimeStep =  _MaturityDate / (_NumberOfFixingDate*_EulerSubStep);
     _Step->Price=_EquityInitialPrice;
     for(int i=0; i<_NumberOfFixingDate; i++){

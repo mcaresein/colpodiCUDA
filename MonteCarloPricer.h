@@ -14,12 +14,12 @@
 
 class MonteCarloPricer{
 public:
-    __device__ __host__ MonteCarloPricer(Option*, MonteCarloPath*, StocasticProcess*, int Nstreams, bool AntitheticVariable);
+    __device__ __host__ MonteCarloPricer(Option*, MonteCarloPath*, StochasticProcess*, int Nstreams, bool AntitheticVariable);
     __device__ __host__ void ComputePrice(Statistics*);
 private:
     Option* _Option;
     MonteCarloPath* _Path;
-    StocasticProcess* _Process;
+    StochasticProcess* _Process;
     int _NStreams;
     bool _AntitheticVariable;
 };

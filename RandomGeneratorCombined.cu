@@ -1,9 +1,7 @@
 #include "RandomGeneratorCombined.h"
 
-__host__ __device__  RandomGeneratorCombined::RandomGeneratorCombined(Seed S, bool BoxMullerWithReExtraction){
+__host__ __device__  RandomGeneratorCombined::RandomGeneratorCombined(Seed S){
     _Seed=S;
-    _BoxMullerWithReExtraction=BoxMullerWithReExtraction;
-    _Status=true;
 };
 
 __host__ __device__  unsigned int RandomGeneratorCombined::LCGStep(unsigned int &seed, unsigned int a, unsigned long b){

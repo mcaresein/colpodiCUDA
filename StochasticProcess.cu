@@ -5,6 +5,14 @@ __host__ __device__ ExactLogNormalProcess::ExactLogNormalProcess(RandomGenerator
     _Generator=Generator;
 };
 
+__host__ __device__ RandomGenerator* StochasticProcess::GetRandomGenerator(){
+    return _Generator;
+};
+
+__host__ __device__ double StochasticProcess::GetRandomNumber(){
+  return _Generator->GetRandomNumber();
+};
+
 __host__ __device__ void ExactLogNormalProcess::Step(UnderlyingPrice * Step, double TimeStep, double RandomNumber){
     double Drift=Step->Anagraphy->Drift;
     double Volatility=Step->Anagraphy->Volatility;
@@ -12,20 +20,13 @@ __host__ __device__ void ExactLogNormalProcess::Step(UnderlyingPrice * Step, dou
 
 };
 
-__host__ __device__ double ExactLogNormalProcess::GetRandomNumber(){
-    return _Generator->GetGaussianRandomNumber();
-};
 
 __host__ __device__  EulerLogNormalProcess::EulerLogNormalProcess(RandomGenerator* Generator){
     _Generator=Generator;
 };
 
-__host__ __device__ void EulerLogNormalProcess::Step(UnderlyingPrice * Step, double TimeStep, double RandomNumber){
+__host__ __device__ void EulerLogNormalProcess::Step(UnderlyingPrice * Step, double TimeStep,  double RandomNumber){
     double Drift=Step->Anagraphy->Drift;
     double Volatility=Step->Anagraphy->Volatility;
     Step->Price=Step->Price*(1.+Drift*TimeStep+Volatility*sqrt(TimeStep)*RandomNumber);
-};
-
-__host__ __device__ double EulerLogNormalProcess::GetRandomNumber(){
-    return _Generator->GetGaussianRandomNumber();
 };
