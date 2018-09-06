@@ -8,7 +8,7 @@
 #include "RandomGenerator.h"
 #include "RandomGeneratorCombined.h"
 #include "RandomGeneratorCombinedGaussian.h"
-#include "RandomGeneratorCombinedBinomial.h"
+#include "RandomGeneratorCombinedBimodal.h"
 #include "Gaussian.h"
 #include "Seed.h"
 #include "MarketData.h"
