@@ -72,8 +72,8 @@ int MCSimulator::main(){
     cout<<endl<<"GPU values:"<<endl;
     output<<endl<<"GPU values:"<<endl;
     PrintActualizedPrice(FinalStatisticsGPU, OptionInput.MaturityDate, MarketInput.Drift, output);
-    cout<<"Simulation time: "<<GPUTime<<" ms"<<endl<<endl;
-    output<<"Simulation time: "<<GPUTime<<" ms"<<endl<<endl;
+    cout<<"Simulation time: "<< GPUTime <<" ms"<<endl<<endl;
+    output<<"Simulation time: "<< GPUTime << " ms"<<endl<<endl;
 
     if(CPUComparison==true){
         cout<<"CPU values:"<<endl;
@@ -158,10 +158,10 @@ void MCSimulator::PrintActualizedPrice(Statistics Stat ,double MaturityDate, dou
     double ActualizedPrice=Stat.GetMean()*exp(-MaturityDate*Drift);
     double MCError=Stat.GetStDev();
 
-    cout<<"Price: "<<ActualizedPrice<<endl;
-    output<<"Price: "<<ActualizedPrice<<endl;
+    cout <<"Price             MC error	"<<endl;
+    cerr << ActualizedPrice << "       " << MCError << endl;;
 
-    cout<<"MC error: "<<MCError<<endl;
+    output<<"Price: "<<ActualizedPrice<<endl;
     output<<"MC error: "<<MCError<<endl;
 };
 
