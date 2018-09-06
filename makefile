@@ -1,8 +1,8 @@
-pricer: main.o MCSimulator.o KernelFunctions.o RandomGenerator.o Gaussian.o Binomial.o RandomGeneratorCombined.o RandomGeneratorCombinedGaussian.o RandomGeneratorCombinedBinomial.o StochasticProcess.o MonteCarloPath.o Option.o MonteCarloPricer.o Statistics.o
-	nvcc -gencode arch=compute_20,code=sm_20 main.o MCSimulator.o KernelFunctions.o RandomGenerator.o RandomGeneratorCombined.o RandomGeneratorCombinedGaussian.o RandomGeneratorCombinedBinomial.o Gaussian.o Binomial.o StochasticProcess.o MonteCarloPath.o Option.o MonteCarloPricer.o Statistics.o -o pricer
+pricer: main.o MCSimulator.o KernelFunctions.o Gaussian.o Binomial.o RandomGeneratorCombined.o RandomGeneratorCombinedGaussian.o RandomGeneratorCombinedBinomial.o StochasticProcess.o MonteCarloPath.o Option.o MonteCarloPricer.o Statistics.o
+	nvcc -gencode arch=compute_20,code=sm_20 main.o MCSimulator.o KernelFunctions.o RandomGeneratorCombined.o RandomGeneratorCombinedGaussian.o RandomGeneratorCombinedBinomial.o Gaussian.o Binomial.o StochasticProcess.o MonteCarloPath.o Option.o MonteCarloPricer.o Statistics.o -o pricer
 
-test: RegressionTest.o MCSimulator.o KernelFunctions.o RandomGenerator.o RandomGeneratorCombined.o RandomGeneratorCombinedGaussian.o RandomGeneratorCombinedBinomial.o Gaussian.o Binomial.o StochasticProcess.o MonteCarloPath.o Option.o MonteCarloPricer.o Statistics.o
-	nvcc -gencode arch=compute_20,code=sm_20 RegressionTest.o MCSimulator.o KernelFunctions.o RandomGenerator.o RandomGeneratorCombined.o RandomGeneratorCombinedGaussian.o RandomGeneratorCombinedBinomial.o Gaussian.o Binomial.o StochasticProcess.o MonteCarloPath.o Option.o MonteCarloPricer.o Statistics.o -o test
+test: RegressionTest.o MCSimulator.o KernelFunctions.o  RandomGeneratorCombined.o RandomGeneratorCombinedGaussian.o RandomGeneratorCombinedBinomial.o Gaussian.o Binomial.o StochasticProcess.o MonteCarloPath.o Option.o MonteCarloPricer.o Statistics.o
+	nvcc -gencode arch=compute_20,code=sm_20 RegressionTest.o MCSimulator.o KernelFunctions.o RandomGeneratorCombined.o RandomGeneratorCombinedGaussian.o RandomGeneratorCombinedBinomial.o Gaussian.o Binomial.o StochasticProcess.o MonteCarloPath.o Option.o MonteCarloPricer.o Statistics.o -o test
 
 RegressionTest.o: RegressionTest.cu
 	nvcc -gencode arch=compute_20,code=sm_20 -dc RegressionTest.cu -o RegressionTest.o -I.
@@ -21,9 +21,6 @@ Binomial.o: Binomial.cu Binomial.h
 
 KernelFunctions.o: KernelFunctions.cu KernelFunctions.h
 	nvcc -gencode arch=compute_20,code=sm_20 -dc KernelFunctions.cu -o KernelFunctions.o -I.
-
-RandomGenerator.o: RandomGenerator.cu  RandomGenerator.h
-	nvcc -gencode arch=compute_20,code=sm_20 -dc RandomGenerator.cu -o RandomGenerator.o -I.
 
 RandomGeneratorCombined.o: RandomGeneratorCombined.cu  RandomGenerator.h RandomGeneratorCombined.h
 	nvcc -gencode arch=compute_20,code=sm_20 -dc RandomGeneratorCombined.cu -o RandomGeneratorCombined.o -I.
@@ -50,4 +47,4 @@ Statistics.o: Statistics.cu Statistics.h
 	nvcc -gencode arch=compute_20,code=sm_20 -dc Statistics.cu -o Statistics.o -I.
 
 clean:
-	rm *.o
+	rm *.o test pricer

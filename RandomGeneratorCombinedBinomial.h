@@ -7,7 +7,7 @@
 class RandomGeneratorCombinedBinomial: public RandomGeneratorCombined, public Binomial{
 public:
   __host__ __device__ RandomGeneratorCombinedBinomial(Seed seed): RandomGeneratorCombined(seed), Binomial(){};
-  __host__ __device__ void SetRandomNumber();
+  __host__ __device__ double GetRandomNumber();
 };
 
 #endif
