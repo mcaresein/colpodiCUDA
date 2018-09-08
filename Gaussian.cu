@@ -1,6 +1,5 @@
-#include <iostream>
-#include <cmath>
 #include "Gaussian.h"
+#include <cmath>
 
  __host__ __device__ Gaussian::Gaussian(bool BoxMullerWithReExtraction){
   _BoxMullerWithReExtraction=BoxMullerWithReExtraction;
