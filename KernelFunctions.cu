@@ -1,5 +1,4 @@
 #include "KernelFunctions.h"
-#include <iostream>
 
 __host__ __device__ void TrueKernel(Seed* SeedVector, Statistics* PayOffs, int streams, MarketData MarketInput, OptionDataContainer OptionInput, SimulationParameters Parameters, int cont){
 
