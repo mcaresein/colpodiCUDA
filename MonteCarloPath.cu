@@ -1,5 +1,4 @@
 #include "MonteCarloPath.h"
-#include <iostream>
 
 __host__ __device__  MonteCarloPath::MonteCarloPath(UnderlyingPrice* Price, double EquityInitialPrice, double MaturityDate, int NumberOfFixingDate, int EulerSubStep, bool AntitheticVariable){
     _MaturityDate=MaturityDate;
