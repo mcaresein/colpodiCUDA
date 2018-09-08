@@ -158,8 +158,8 @@ void MCSimulator::PrintActualizedPrice(Statistics Stat ,double MaturityDate, dou
     double ActualizedPrice=Stat.GetMean()*exp(-MaturityDate*Drift);
     double MCError=Stat.GetStDev();
 
-    cout <<"Price             MC error	"<<endl;
-    cerr << ActualizedPrice << "       " << MCError << endl;;
+    cout <<"Price:"<<"\t\t"<<"MC error:"<<endl;
+    cerr << ActualizedPrice << "\t\t" << MCError << endl;
 
     output<<"Price: "<<ActualizedPrice<<endl;
     output<<"MC error: "<<MCError<<endl;
